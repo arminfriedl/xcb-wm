@@ -1,0 +1,20 @@
+[package]
+name = "rust-xcb-wm"
+version = "0.1.0"
+authors = [ "Armin Friedl <dev@friedl.net>" ]
+description = "Rust implementation of xcb-wm - icccm and ewmh extensions for xcb"
+readme = "README.md"
+keyworks = ["icccm", "ewmh", "xcb-wm", "xcb", "window", "xlib", "x11"]
+license = "MIT"
+edition = "2018"
+repository = "https://git.friedl.net/incubator/rust-xcb-wm"
+homepage = "https://git.friedl.net/incubator/rust-xcb-wm"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+xcb = "1"
+
+[features]
+icccm = []
+ewmh = []
