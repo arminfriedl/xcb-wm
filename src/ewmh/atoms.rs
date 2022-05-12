@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-const ATOM_NAMES: [&'static str; 82] = [
+const ATOM_NAMES: [&str; 82] = [
     "_NET_SUPPORTED",
     "_NET_CLIENT_LIST",
     "_NET_CLIENT_LIST_STACKING",
@@ -85,6 +85,7 @@ const ATOM_NAMES: [&'static str; 82] = [
     "_NET_WM_ACTION_BELOW"
 ];
 
+#[allow(non_snake_case)]
 pub struct Atoms {
     // TODO _NET_WM_CM_Sn atoms
     pub _NET_SUPPORTED: xcb::x::Atom,
