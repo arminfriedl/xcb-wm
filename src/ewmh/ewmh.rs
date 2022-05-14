@@ -304,4 +304,128 @@ mod tests {
         let reply = xcb_con.check_request(cookie);
         println!("{:?}", reply);
     }
+
+    #[test]
+    fn wm_name() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(77594744) };
+
+        let request = crate::ewmh::proto::GetWmName::new(window);
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = ewmh_con.wait_for_reply(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn wm_visible_name() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(20983603) };
+
+        let request = crate::ewmh::proto::GetWmVisibleName::new(window);
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = ewmh_con.wait_for_reply(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn wm_desktop() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(20983603) };
+
+        let request = crate::ewmh::proto::GetWmDesktop::new(window);
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = ewmh_con.wait_for_reply(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn set_wm_type() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(20995834) };
+
+        let request = crate::ewmh::proto::SetWmWindowType::new(
+            window,
+            vec![
+                ewmh_con.atoms._NET_WM_WINDOW_TYPE_UTILITY,
+                ewmh_con.atoms._NET_WM_WINDOW_TYPE_SPLASH,
+            ],
+        );
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = xcb_con.check_request(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn get_wm_type() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(20995834) };
+
+        let request = crate::ewmh::proto::GetWmWindowType::new(window);
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = ewmh_con.wait_for_reply(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn set_wm_state() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(21002424) };
+
+        let request = crate::ewmh::proto::SetWmState::new(
+            window,
+            vec![
+                ewmh_con.atoms._NET_WM_STATE_STICKY,
+                ewmh_con.atoms._NET_WM_STATE_DEMANDS_ATTENTION,
+            ],
+        );
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = xcb_con.check_request(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn get_wm_state() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(21002424) };
+
+        let request = crate::ewmh::proto::GetWmWindowType::new(window);
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = ewmh_con.wait_for_reply(cookie);
+        println!("{:?}", reply);
+    }
 }

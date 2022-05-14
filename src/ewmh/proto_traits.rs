@@ -1,5 +1,3 @@
-#![macro_use]
-
 use crate::ewmh::ewmh::Connection;
 
 pub(crate) trait EwmhRequest<'a>: EwmhRequestData<'a> {
@@ -23,6 +21,155 @@ pub(crate) trait EwmhCookie {
 pub(crate) trait EwmhCookieUnchecked {
     type Reply;
     fn reply(self, con: &Connection) -> Option<Self::Reply>;
+}
+
+macro_rules! ewmh_get_window_request_private {
+    ($req: ident, $prop: ident, $cookie: ident, $cookie_unchecked: ident, $reply: ident) => {
+        pub struct $req {
+            window: xcb::x::Window,
+        }
+
+        pub struct $cookie {
+            cookie: xcb::x::GetPropertyCookie,
+        }
+        pub struct $cookie_unchecked {
+            cookie: xcb::x::GetPropertyCookieUnchecked,
+        }
+
+        impl $req {
+            pub fn new(window: xcb::x::Window) -> $req {
+                $req { window }
+            }
+        }
+
+        impl<'a> EwmhRequest<'a> for $req {
+            type Cookie = $cookie;
+            type CookieUnchecked = $cookie_unchecked;
+
+            fn send_request(&self, con: &Connection) -> Self::Cookie {
+                $cookie {
+                    cookie: con.con.send_request(&self.get_request_data(con)),
+                }
+            }
+
+            fn send_request_unchecked(&self, con: &Connection) -> Self::CookieUnchecked {
+                $cookie_unchecked {
+                    cookie: con.con.send_request_unchecked(&self.get_request_data(con)),
+                }
+            }
+        }
+
+        impl EwmhCookie for $cookie {
+            type Reply = $reply;
+
+            fn reply(self, con: &Connection) -> Self::Reply {
+                let reply = con.con.wait_for_reply(self.cookie).unwrap();
+                reply.into()
+            }
+        }
+
+        impl EwmhCookieUnchecked for $cookie_unchecked {
+            type Reply = $reply;
+
+            fn reply(self, con: &Connection) -> Option<Self::Reply> {
+                con.con
+                    .wait_for_reply_unchecked(self.cookie)
+                    .unwrap()
+                    .map(|reply| reply.into())
+            }
+        }
+    };
+}
+
+macro_rules! ewmh_get_window_request {
+    ($req: ident, $prop: ident, UTF8_STRING, $cookie: ident, $cookie_unchecked: ident, $reply: ident) => {
+        ewmh_get_window_request_private! {$req, $prop, $cookie, $cookie_unchecked, $reply}
+
+        impl<'a> EwmhRequestData<'a> for $req {
+            type Request = xcb::x::GetProperty;
+
+            fn get_request_data(&'a self, con: &Connection) -> Self::Request {
+                xcb::x::GetProperty {
+                    delete: false,
+                    window: self.window,
+                    property: con.atoms.$prop,
+                    r#type: con.atoms.UTF8_STRING,
+                    long_offset: 0,
+                    long_length: u32::MAX,
+                }
+            }
+        }
+    };
+
+    ($req: ident, $prop: ident, CARDINAL, $cookie: ident, $cookie_unchecked: ident, $reply: ident) => {
+        ewmh_get_window_request_private! {$req, $prop, $cookie, $cookie_unchecked, $reply}
+
+        impl<'a> EwmhRequestData<'a> for $req {
+            type Request = xcb::x::GetProperty;
+
+            fn get_request_data(&'a self, con: &Connection) -> Self::Request {
+                xcb::x::GetProperty {
+                    delete: false,
+                    window: self.window,
+                    property: con.atoms.$prop,
+                    r#type: xcb::x::ATOM_CARDINAL,
+                    long_offset: 0,
+                    long_length: u32::MAX,
+                }
+            }
+        }
+    };
+
+    ($req: ident, $prop: ident, ATOM, $cookie: ident, $cookie_unchecked: ident, $reply: ident) => {
+        ewmh_get_window_request_private! {$req, $prop, $cookie, $cookie_unchecked, $reply}
+
+        impl<'a> EwmhRequestData<'a> for $req {
+            type Request = xcb::x::GetProperty;
+
+            fn get_request_data(&'a self, con: &Connection) -> Self::Request {
+                xcb::x::GetProperty {
+                    delete: false,
+                    window: self.window,
+                    property: con.atoms.$prop,
+                    r#type: xcb::x::ATOM_ATOM,
+                    long_offset: 0,
+                    long_length: u32::MAX,
+                }
+            }
+        }
+    };
+
+}
+
+macro_rules! ewmh_set_window_request {
+    ($req: ident, $prop: ident, $type: tt) => {
+        impl<'a> EwmhRequest<'a> for $req {
+            type Cookie = xcb::VoidCookieChecked;
+            type CookieUnchecked = xcb::VoidCookie;
+
+            fn send_request(&self, con: &Connection) -> Self::Cookie {
+                con.con.send_request_checked(&self.get_request_data(con))
+            }
+
+            fn send_request_unchecked(&self, con: &Connection) -> Self::CookieUnchecked {
+                con.con.send_request(&self.get_request_data(con))
+            }
+        }
+
+        impl<'a> EwmhRequestData<'a> for $req {
+            type Request = xcb::x::ChangeProperty<'a, xcb::x::Atom>;
+
+            fn get_request_data(&'a self, con: &Connection) -> Self::Request {
+                xcb::x::ChangeProperty {
+                    mode: xcb::x::PropMode::Replace,
+                    window: self.window,
+                    property: con.atoms.$prop,
+                    r#type: $type,
+                    data: &self.data,
+                }
+            }
+        }
+    };
 }
 
 macro_rules! ewmh_get_request {
