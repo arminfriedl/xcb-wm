@@ -271,4 +271,37 @@ mod tests {
         let reply = xcb_con.check_request(cookie);
         println!("{:?}", reply);
     }
+
+    #[test]
+    fn close_window() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(20979719) };
+
+        let request =
+            crate::ewmh::proto::CloseWindow::new(&ewmh_con, window, 0, xcb::x::CURRENT_TIME);
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = xcb_con.check_request(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn request_frame_extents() {
+        use xcb::XidNew;
+
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let ewmh_con = crate::ewmh::ewmh::Connection::connect(&xcb_con);
+
+        let window = unsafe { xcb::x::Window::new(20979719) };
+
+        let request = crate::ewmh::proto::RequestFrameExtents::new(&ewmh_con, window);
+
+        let cookie = ewmh_con.send_request(request);
+        let reply = xcb_con.check_request(cookie);
+        println!("{:?}", reply);
+    }
 }

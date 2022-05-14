@@ -604,3 +604,133 @@ impl<'a> EwmhRequestData<'a> for SetShowingDesktop {
 }
 
 // }}}
+
+// _NET_CLOSE_WINDOW
+// {{{
+pub struct CloseWindow {
+    client_message: xcb::x::ClientMessageEvent,
+}
+
+impl CloseWindow {
+    pub fn new(
+        connection: &Connection,
+        window: xcb::x::Window,
+        source_indication: u32,
+        timestamp: u32,
+    ) -> CloseWindow {
+        let data = [timestamp, source_indication, 0x00, 0x00, 0x00];
+
+        let client_message = xcb::x::ClientMessageEvent::new(
+            window,
+            connection.atoms._NET_CLOSE_WINDOW,
+            xcb::x::ClientMessageData::Data32(data),
+        );
+
+        CloseWindow { client_message }
+    }
+}
+
+impl<'a> EwmhRequest<'a> for CloseWindow {
+    type Cookie = xcb::VoidCookieChecked;
+    type CookieUnchecked = xcb::VoidCookie;
+
+    fn send_request(&self, con: &Connection) -> Self::Cookie {
+        con.con.send_request_checked(&self.get_request_data(con))
+    }
+
+    fn send_request_unchecked(&self, con: &Connection) -> Self::CookieUnchecked {
+        con.con.send_request(&self.get_request_data(con))
+    }
+}
+
+impl<'a> EwmhRequestData<'a> for CloseWindow {
+    type Request = xcb::x::SendEvent<'a, xcb::x::ClientMessageEvent>;
+
+    fn get_request_data(
+        &'a self,
+        con: &Connection,
+    ) -> xcb::x::SendEvent<'a, xcb::x::ClientMessageEvent> {
+        xcb::x::SendEvent {
+            propagate: false,
+            destination: xcb::x::SendEventDest::Window(
+                con.con.get_setup().roots().next().unwrap().root(),
+            ),
+            event_mask: xcb::x::EventMask::SUBSTRUCTURE_NOTIFY
+                | xcb::x::EventMask::SUBSTRUCTURE_REDIRECT,
+            event: &self.client_message,
+        }
+    }
+}
+// }}}
+
+// _NET_MOVERESIZE_WINDOW
+// {{{
+
+// TODO
+
+// }}}
+
+// _NET_WM_MOVERESIZE
+// {{{
+
+// TODO
+
+// }}}
+
+// _NET_RESTACK_WINDOW
+// {{{
+
+// TODO
+
+// }}}
+
+// _NET_REQUEST_FRAME_EXTENTS
+// {{{
+pub struct RequestFrameExtents {
+    client_message: xcb::x::ClientMessageEvent,
+}
+
+impl RequestFrameExtents {
+    pub fn new(connection: &Connection, window: xcb::x::Window) -> RequestFrameExtents {
+        let client_message = xcb::x::ClientMessageEvent::new(
+            window,
+            connection.atoms._NET_REQUEST_FRAME_EXTENTS,
+            xcb::x::ClientMessageData::Data32([0x0, 0x0, 0x0, 0x0, 0x0]),
+        );
+
+        RequestFrameExtents { client_message }
+    }
+}
+
+impl<'a> EwmhRequest<'a> for RequestFrameExtents {
+    type Cookie = xcb::VoidCookieChecked;
+    type CookieUnchecked = xcb::VoidCookie;
+
+    fn send_request(&self, con: &Connection) -> Self::Cookie {
+        con.con.send_request_checked(&self.get_request_data(con))
+    }
+
+    fn send_request_unchecked(&self, con: &Connection) -> Self::CookieUnchecked {
+        con.con.send_request(&self.get_request_data(con))
+    }
+}
+
+impl<'a> EwmhRequestData<'a> for RequestFrameExtents {
+    type Request = xcb::x::SendEvent<'a, xcb::x::ClientMessageEvent>;
+
+    fn get_request_data(
+        &'a self,
+        con: &Connection,
+    ) -> xcb::x::SendEvent<'a, xcb::x::ClientMessageEvent> {
+        xcb::x::SendEvent {
+            propagate: false,
+            destination: xcb::x::SendEventDest::Window(
+                con.con.get_setup().roots().next().unwrap().root(),
+            ),
+            event_mask: xcb::x::EventMask::SUBSTRUCTURE_NOTIFY
+                | xcb::x::EventMask::SUBSTRUCTURE_REDIRECT,
+            event: &self.client_message,
+        }
+    }
+}
+// }}}

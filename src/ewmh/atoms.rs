@@ -82,7 +82,7 @@ const ATOM_NAMES: [&str; 82] = [
     "_NET_WM_ACTION_CHANGE_DESKTOP",
     "_NET_WM_ACTION_CLOSE",
     "_NET_WM_ACTION_ABOVE",
-    "_NET_WM_ACTION_BELOW"
+    "_NET_WM_ACTION_BELOW",
 ];
 
 #[allow(non_snake_case)]
@@ -169,12 +169,11 @@ pub struct Atoms {
     pub _NET_WM_ACTION_CHANGE_DESKTOP: xcb::x::Atom,
     pub _NET_WM_ACTION_CLOSE: xcb::x::Atom,
     pub _NET_WM_ACTION_ABOVE: xcb::x::Atom,
-    pub _NET_WM_ACTION_BELOW: xcb::x::Atom
+    pub _NET_WM_ACTION_BELOW: xcb::x::Atom,
 }
 
-
 impl Atoms {
-    pub (crate) fn intern(con: &xcb::Connection) -> Atoms {
+    pub(crate) fn intern(con: &xcb::Connection) -> Atoms {
         let mut cookies: HashMap<&'static str, xcb::x::InternAtomCookie> = HashMap::new();
 
         for atom in ATOM_NAMES {
@@ -186,7 +185,8 @@ impl Atoms {
             cookies.insert(atom, con.send_request(&intern_atom));
         }
 
-        let interned_atoms: HashMap<&'static str, xcb::x::Atom> = cookies.into_iter()
+        let interned_atoms: HashMap<&'static str, xcb::x::Atom> = cookies
+            .into_iter()
             .map(|(atom_name, cookie)| (atom_name, con.wait_for_reply(cookie).unwrap()))
             .map(|(atom_name, reply)| (atom_name, reply.atom()))
             .collect();
@@ -247,10 +247,14 @@ impl Atoms {
             _NET_WM_WINDOW_TYPE_UTILITY: atoms.remove("_NET_WM_WINDOW_TYPE_UTILITY").unwrap(),
             _NET_WM_WINDOW_TYPE_SPLASH: atoms.remove("_NET_WM_WINDOW_TYPE_SPLASH").unwrap(),
             _NET_WM_WINDOW_TYPE_DIALOG: atoms.remove("_NET_WM_WINDOW_TYPE_DIALOG").unwrap(),
-            _NET_WM_WINDOW_TYPE_DROPDOWN_MENU: atoms.remove("_NET_WM_WINDOW_TYPE_DROPDOWN_MENU").unwrap(),
+            _NET_WM_WINDOW_TYPE_DROPDOWN_MENU: atoms
+                .remove("_NET_WM_WINDOW_TYPE_DROPDOWN_MENU")
+                .unwrap(),
             _NET_WM_WINDOW_TYPE_POPUP_MENU: atoms.remove("_NET_WM_WINDOW_TYPE_POPUP_MENU").unwrap(),
             _NET_WM_WINDOW_TYPE_TOOLTIP: atoms.remove("_NET_WM_WINDOW_TYPE_TOOLTIP").unwrap(),
-            _NET_WM_WINDOW_TYPE_NOTIFICATION: atoms.remove("_NET_WM_WINDOW_TYPE_NOTIFICATION").unwrap(),
+            _NET_WM_WINDOW_TYPE_NOTIFICATION: atoms
+                .remove("_NET_WM_WINDOW_TYPE_NOTIFICATION")
+                .unwrap(),
             _NET_WM_WINDOW_TYPE_COMBO: atoms.remove("_NET_WM_WINDOW_TYPE_COMBO").unwrap(),
             _NET_WM_WINDOW_TYPE_DND: atoms.remove("_NET_WM_WINDOW_TYPE_DND").unwrap(),
             _NET_WM_WINDOW_TYPE_NORMAL: atoms.remove("_NET_WM_WINDOW_TYPE_NORMAL").unwrap(),
@@ -265,7 +269,9 @@ impl Atoms {
             _NET_WM_STATE_FULLSCREEN: atoms.remove("_NET_WM_STATE_FULLSCREEN").unwrap(),
             _NET_WM_STATE_ABOVE: atoms.remove("_NET_WM_STATE_ABOVE").unwrap(),
             _NET_WM_STATE_BELOW: atoms.remove("_NET_WM_STATE_BELOW").unwrap(),
-            _NET_WM_STATE_DEMANDS_ATTENTION: atoms.remove("_NET_WM_STATE_DEMANDS_ATTENTION").unwrap(),
+            _NET_WM_STATE_DEMANDS_ATTENTION: atoms
+                .remove("_NET_WM_STATE_DEMANDS_ATTENTION")
+                .unwrap(),
             _NET_WM_ACTION_MOVE: atoms.remove("_NET_WM_ACTION_MOVE").unwrap(),
             _NET_WM_ACTION_RESIZE: atoms.remove("_NET_WM_ACTION_RESIZE").unwrap(),
             _NET_WM_ACTION_MINIMIZE: atoms.remove("_NET_WM_ACTION_MINIMIZE").unwrap(),
