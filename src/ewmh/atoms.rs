@@ -85,6 +85,12 @@ const ATOM_NAMES: [&str; 82] = [
     "_NET_WM_ACTION_BELOW",
 ];
 
+/// Interned [`xcb::x::Atom`]s for the `ewmh` protocol
+///
+/// The ids for these atoms are created when the [`crate::ewmh::Connection`] is established. Hence,
+/// are bound to the [`crate::ewmh::Connection`] and can only be retrieved from there.
+///
+/// See also: [`wm spec 1.5`](https://specifications.freedesktop.org/wm-spec/wm-spec-1.5)
 #[allow(non_snake_case)]
 pub struct Atoms {
     // TODO _NET_WM_CM_Sn atoms

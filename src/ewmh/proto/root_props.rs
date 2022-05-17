@@ -1,10 +1,10 @@
 //! Root Window Properties (and Related Messages)
 //!
-//! see: https://specifications.freedesktop.org/wm-spec/1.5/ar01s03.html#idm45539547193552
+//! see: <https://specifications.freedesktop.org/wm-spec/1.5/ar01s03.html#idm45539547193552>
 
 use xcb::{Xid, XidNew};
 
-use crate::ewmh::ewmh::Connection;
+use crate::ewmh::connection::Connection;
 use crate::ewmh::proto_traits::{EwmhCookie, EwmhCookieUnchecked, EwmhRequest, EwmhRequestData};
 
 // _NET_SUPPORTED, ATOM[]/32

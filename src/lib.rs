@@ -1,4 +1,7 @@
-mod ewmh;
+#![warn(rustdoc::broken_intra_doc_links)]
+#![warn(rustdoc::private_intra_doc_links)]
+
+pub mod ewmh;
 
 #[cfg(test)]
 mod tests {

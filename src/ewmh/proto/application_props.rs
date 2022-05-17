@@ -1,10 +1,10 @@
 //! Application Window Properties
 //!
-//! see: https://specifications.freedesktop.org/wm-spec/wm-spec-1.5.html#idm45446104426048
+//! see: <https://specifications.freedesktop.org/wm-spec/wm-spec-1.5.html#idm45446104426048>
 
 use xcb::{Xid, XidNew};
 
-use crate::ewmh::ewmh::Connection;
+use crate::ewmh::connection::Connection;
 use crate::ewmh::proto_traits::{EwmhCookie, EwmhCookieUnchecked, EwmhRequest, EwmhRequestData};
 
 // _NET_WM_NAME, UTF8_STRING
@@ -204,13 +204,12 @@ pub struct GetWmWindowTypeReply {
 impl From<xcb::x::GetPropertyReply> for GetWmWindowTypeReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmWindowTypeReply {
-            types: reply.value::<xcb::x::Atom>().into()
+            types: reply.value::<xcb::x::Atom>().into(),
         }
     }
 }
 
 // }}}
-
 
 // _NET_WM_STATE, ATOM[]/32
 // {{{
@@ -252,7 +251,7 @@ pub struct GetWmStateReply {
 impl From<xcb::x::GetPropertyReply> for GetWmStateReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmStateReply {
-            types: reply.value::<xcb::x::Atom>().into()
+            types: reply.value::<xcb::x::Atom>().into(),
         }
     }
 }
