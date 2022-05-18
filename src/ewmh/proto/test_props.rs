@@ -1,3 +1,34 @@
+fn x_buffer_to_strings(xbuf: &[u8]) -> Vec<String> {
+    let mut vals = vec![];
+    let mut buf = vec![];
+
+    for b in xbuf {
+        if *b != 0x00 {
+            buf.push(*b)
+        } else if !buf.is_empty() {
+            vals.push(String::from_utf8(buf.clone()).unwrap());
+            buf.clear();
+        } else {
+            buf.clear();
+        }
+    }
+
+    vals
+}
+
+fn strings_to_x_buffer(strings: Vec<&str>) -> Vec<u8> {
+    let mut data = vec![];
+
+    // flatten `strings` into a continuous, NULL separated, array of bytes
+    for s in strings {
+        let mut bs = s.as_bytes().to_owned();
+        bs.push(0b00);
+        data.extend(bs)
+    }
+
+    data
+}
+
 pub(crate) mod net_supported {
     use crate::ewmh::traits::*;
     use crate::ewmh::Connection;
@@ -13,68 +44,6 @@ pub(crate) mod net_supported {
         pub atoms: Vec<xcb::x::Atom>,
     }
 
-    impl<'a> EwmhRequest<'a> for GetSupported {
-        type XcbRequest = xcb::x::GetProperty;
-        type EwmhCookie = GetSupportedCookie;
-
-        fn xcb_request(&self, con: &Connection) -> Self::XcbRequest {
-            xcb::x::GetProperty {
-                delete: false,
-                window: con.con.get_setup().roots().next().unwrap().root(),
-                property: con.atoms._NET_SUPPORTED,
-                r#type: xcb::x::ATOM_ATOM,
-                long_offset: 0,
-                long_length: u32::MAX,
-            }
-        }
-
-        fn convert_cookie(&'a self, xcb_cookie: xcb::x::GetPropertyCookie) -> Self::EwmhCookie {
-            GetSupportedCookie(xcb_cookie)
-        }
-    }
-
-    impl EwmhPropertyRequestUnchecked for GetSupported {
-        type EwmhCookie = GetSupportedCookieUnchecked;
-
-        fn convert_cookie(
-            &self,
-            xcb_cookie: xcb::x::GetPropertyCookieUnchecked,
-        ) -> Self::EwmhCookie {
-            GetSupportedCookieUnchecked(xcb_cookie)
-        }
-
-        fn xcb_request(&self, con: &Connection) -> xcb::x::GetProperty {
-            xcb::x::GetProperty {
-                delete: false,
-                window: con.con.get_setup().roots().next().unwrap().root(),
-                property: con.atoms._NET_SUPPORTED,
-                r#type: xcb::x::ATOM_ATOM,
-                long_offset: 0,
-                long_length: u32::MAX,
-            }
-        }
-    }
-
-    impl EwmhCookie for GetSupportedCookie {
-        type XcbCookie = xcb::x::GetPropertyCookie;
-    }
-
-    impl EwmhPropertyCookieChecked for GetSupportedCookie {
-        type Reply = GetSupportedReply;
-
-        fn inner(self) -> xcb::x::GetPropertyCookie {
-            self.0
-        }
-    }
-
-    impl EwmhPropertyCookieUnchecked for GetSupportedCookieUnchecked {
-        type Reply = GetSupportedReply;
-
-        fn inner(self) -> xcb::x::GetPropertyCookieUnchecked {
-            self.0
-        }
-    }
-
     impl From<xcb::x::GetPropertyReply> for GetSupportedReply {
         fn from(reply: xcb::x::GetPropertyReply) -> Self {
             GetSupportedReply {
@@ -82,9 +51,21 @@ pub(crate) mod net_supported {
             }
         }
     }
+
+    ewmh_get_property! {
+        request=GetSupported{
+            window: root_window,
+            property: _NET_SUPPORTED,
+            xtype: ATOM_ATOM
+        },
+        reply=GetSupportedReply,
+        cookie=GetSupportedCookie,
+        cookie_unchecked=GetSupportedCookieUnchecked
+    }
 }
 
 pub(crate) mod net_desktop_names {
+    use crate::ewmh::proto::test_props::{strings_to_x_buffer, x_buffer_to_strings};
     use crate::ewmh::traits::*;
     use crate::ewmh::Connection;
 
@@ -99,88 +80,23 @@ pub(crate) mod net_desktop_names {
         pub desktop_names: Vec<String>,
     }
 
-    impl<'a> EwmhRequest<'a> for GetDesktopNames {
-        type XcbRequest = xcb::x::GetProperty;
-        type EwmhCookie = GetDesktopNamesCookie;
-
-        fn xcb_request(&self, con: &Connection) -> Self::XcbRequest {
-            xcb::x::GetProperty {
-                delete: false,
-                window: con.con.get_setup().roots().next().unwrap().root(),
-                property: con.atoms._NET_DESKTOP_NAMES,
-                r#type: con.atoms.UTF8_STRING,
-                long_offset: 0,
-                long_length: u32::MAX,
-            }
-        }
-
-        fn convert_cookie(&'a self, xcb_cookie: xcb::x::GetPropertyCookie) -> Self::EwmhCookie {
-            GetDesktopNamesCookie(xcb_cookie)
-        }
-    }
-
-    impl EwmhPropertyRequestUnchecked for GetDesktopNames {
-        type EwmhCookie = GetDesktopNamesCookieUnchecked;
-
-        fn convert_cookie(
-            &self,
-            xcb_cookie: xcb::x::GetPropertyCookieUnchecked,
-        ) -> Self::EwmhCookie {
-            GetDesktopNamesCookieUnchecked(xcb_cookie)
-        }
-
-        fn xcb_request(&self, con: &Connection) -> xcb::x::GetProperty {
-            xcb::x::GetProperty {
-                delete: false,
-                window: con.con.get_setup().roots().next().unwrap().root(),
-                property: con.atoms._NET_DESKTOP_NAMES,
-                r#type: con.atoms.UTF8_STRING,
-                long_offset: 0,
-                long_length: u32::MAX,
-            }
-        }
-    }
-
-    impl EwmhCookie for GetDesktopNamesCookie {
-        type XcbCookie = xcb::x::GetPropertyCookie;
-    }
-
-    impl EwmhPropertyCookieChecked for GetDesktopNamesCookie {
-        type Reply = GetDesktopNamesReply;
-
-        fn inner(self) -> xcb::x::GetPropertyCookie {
-            self.0
-        }
-    }
-
-    impl EwmhPropertyCookieUnchecked for GetDesktopNamesCookieUnchecked {
-        type Reply = GetDesktopNamesReply;
-
-        fn inner(self) -> xcb::x::GetPropertyCookieUnchecked {
-            self.0
-        }
-    }
-
     impl From<xcb::x::GetPropertyReply> for GetDesktopNamesReply {
         fn from(reply: xcb::x::GetPropertyReply) -> Self {
-            let mut vals = vec![];
-            let mut buf = vec![];
-
-            for b in reply.value::<u8>() {
-                if *b != 0x00 {
-                    buf.push(*b)
-                } else if !buf.is_empty() {
-                    vals.push(String::from_utf8(buf.clone()).unwrap());
-                    buf.clear();
-                } else {
-                    buf.clear();
-                }
-            }
-
             GetDesktopNamesReply {
-                desktop_names: vals,
+                desktop_names: x_buffer_to_strings(reply.value::<u8>()),
             }
         }
+    }
+
+    ewmh_get_property! {
+        request=GetDesktopNames{
+            window: root_window,
+            property: _NET_DESKTOP_NAMES,
+            xtype: UTF8_STRING
+        },
+        reply=GetDesktopNamesReply,
+        cookie=GetDesktopNamesCookie,
+        cookie_unchecked=GetDesktopNamesCookieUnchecked
     }
 
     pub struct SetDesktopNames {
@@ -189,49 +105,17 @@ pub(crate) mod net_desktop_names {
 
     impl SetDesktopNames {
         pub fn new(names: Vec<&str>) -> SetDesktopNames {
-            let mut data: Vec<u8> = vec![];
-
-            // flatten `new_names` into a continuous array of bytes
-            for name in names {
-                let mut bname = name.as_bytes().to_owned();
-                bname.push(0b00);
-                data.extend(bname)
+            SetDesktopNames {
+                data: strings_to_x_buffer(names),
             }
-
-            SetDesktopNames { data }
         }
     }
 
-    impl<'a> EwmhRequest<'a> for SetDesktopNames {
-        type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
-        type EwmhCookie = xcb::VoidCookie;
-
-        fn xcb_request(&'a self, con: &Connection) -> Self::XcbRequest {
-            xcb::x::ChangeProperty {
-                mode: xcb::x::PropMode::Replace,
-                window: con.con.get_setup().roots().next().unwrap().root(),
-                property: con.atoms._NET_DESKTOP_NAMES,
-                r#type: con.atoms.UTF8_STRING,
-                data: &self.data,
-            }
-        }
-
-        fn convert_cookie(&'a self, xcb_cookie: xcb::VoidCookie) -> Self::EwmhCookie {
-            xcb_cookie
-        }
-    }
-
-    impl<'a> EwmhVoidRequestChecked<'a> for SetDesktopNames {
-        type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
-
-        fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
-            xcb::x::ChangeProperty {
-                mode: xcb::x::PropMode::Replace,
-                window: con.con.get_setup().roots().next().unwrap().root(),
-                property: con.atoms._NET_DESKTOP_NAMES,
-                r#type: con.atoms.UTF8_STRING,
-                data: &self.data,
-            }
+    ewmh_set_property! {
+        request=SetDesktopNames{
+            window: root_window,
+            property: _NET_DESKTOP_NAMES,
+            xtype: UTF8_STRING
         }
     }
 }
@@ -261,40 +145,7 @@ pub(crate) mod net_showing_desktop {
         }
     }
 
-    impl<'a> EwmhRequest<'a> for SetShowingDesktop {
-        type XcbRequest = xcb::x::SendEvent<'a, xcb::x::ClientMessageEvent>;
-        type EwmhCookie = xcb::VoidCookie;
-
-        fn xcb_request(&'a self, con: &Connection) -> Self::XcbRequest {
-            xcb::x::SendEvent {
-                propagate: false,
-                destination: xcb::x::SendEventDest::Window(
-                    con.con.get_setup().roots().next().unwrap().root(),
-                ),
-                event_mask: xcb::x::EventMask::SUBSTRUCTURE_NOTIFY
-                    | xcb::x::EventMask::SUBSTRUCTURE_REDIRECT,
-                event: &self.client_message,
-            }
-        }
-
-        fn convert_cookie(&'a self, xcb_cookie: xcb::VoidCookie) -> Self::EwmhCookie {
-            xcb_cookie
-        }
-    }
-
-    impl<'a> EwmhVoidRequestChecked<'a> for SetShowingDesktop {
-        type XcbRequest = xcb::x::SendEvent<'a, xcb::x::ClientMessageEvent>;
-
-        fn xcb_request(&'a self, con: &Connection) -> Self::XcbRequest {
-            xcb::x::SendEvent {
-                propagate: false,
-                destination: xcb::x::SendEventDest::Window(
-                    con.con.get_setup().roots().next().unwrap().root(),
-                ),
-                event_mask: xcb::x::EventMask::SUBSTRUCTURE_NOTIFY
-                    | xcb::x::EventMask::SUBSTRUCTURE_REDIRECT,
-                event: &self.client_message,
-            }
-        }
+    ewmh_client_message! {
+        request=SetShowingDesktop{destination: root_window}
     }
 }

@@ -78,7 +78,7 @@ mod tests {
         let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
         let ewmh_con = crate::ewmh::Connection::connect(&xcb_con);
 
-        let request = crate::ewmh::GetSupported;
+        let request = crate::ewmh::proto::GetSupported;
         let cookie = ewmh_con.send_request(&request);
         let reply = ewmh_con.wait_for_reply(cookie);
         println!("{:?}", reply);
@@ -205,7 +205,7 @@ mod tests {
         let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
         let ewmh_con = crate::ewmh::Connection::connect(&xcb_con);
 
-        let request = crate::ewmh::GetDesktopNames {};
+        let request = crate::ewmh::proto::GetDesktopNames {};
         let cookie = ewmh_con.send_request(&request);
         let reply = ewmh_con.wait_for_reply(cookie);
         println!("{:?}", reply);
@@ -216,7 +216,7 @@ mod tests {
         let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
         let ewmh_con = crate::ewmh::Connection::connect(&xcb_con);
 
-        let request = crate::ewmh::SetDesktopNames::new(vec!["X", "Y", "Z"]);
+        let request = crate::ewmh::proto::SetDesktopNames::new(vec!["A", "B", "Z"]);
         let cookie = ewmh_con.send_request_checked(&request);
         let reply = xcb_con.check_request(cookie);
         println!("{:?}", reply);
@@ -303,7 +303,7 @@ mod tests {
         let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
         let ewmh_con = crate::ewmh::Connection::connect(&xcb_con);
 
-        let request = crate::ewmh::SetShowingDesktop::new(&ewmh_con, true);
+        let request = crate::ewmh::proto::SetShowingDesktop::new(&ewmh_con, true);
         let cookie = ewmh_con.send_request_checked(&request);
         let reply = xcb_con.check_request(cookie);
         println!("{:?}", reply);

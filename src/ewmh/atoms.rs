@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+// TODO use xcb::atom_struct!{} for this?
 const ATOM_NAMES: [&str; 82] = [
     "_NET_SUPPORTED",
     "_NET_CLIENT_LIST",

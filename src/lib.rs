@@ -1,6 +1,7 @@
 #![warn(rustdoc::broken_intra_doc_links)]
 #![warn(rustdoc::private_intra_doc_links)]
 
+#[cfg(feature = "ewmh")]
 pub mod ewmh;
 
 #[cfg(test)]
