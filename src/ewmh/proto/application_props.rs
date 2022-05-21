@@ -4,19 +4,15 @@
 
 use xcb::{Xid, XidNew};
 
-use crate::ewmh::connection::Connection;
-use crate::ewmh::proto_traits::{EwmhCookie, EwmhCookieUnchecked, EwmhRequest, EwmhRequestData};
+use crate::ewmh::proto::util::{strings_to_x_buffer, x_buffer_to_strings};
+use crate::ewmh::traits::*;
+use crate::ewmh::Connection;
 
 // _NET_WM_NAME, UTF8_STRING
 // {{{
-ewmh_get_window_request! {
-    GetWmName,
-    _NET_WM_NAME,
-    UTF8_STRING,
-    GetWmNameCookie,
-    GetWmNameCookieUnchecked,
-    GetWmNameReply
-}
+pub struct GetWmName(xcb::x::Window);
+pub struct GetWmNameCookie(xcb::x::GetPropertyCookie);
+pub struct GetWmNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
 
 #[derive(Debug)]
 pub struct GetWmNameReply {
@@ -25,31 +21,52 @@ pub struct GetWmNameReply {
 
 impl From<xcb::x::GetPropertyReply> for GetWmNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
-        let mut buf = vec![];
-
-        for b in reply.value::<u8>() {
-            if *b != 0x00 {
-                buf.push(*b)
-            }
-        }
-
         GetWmNameReply {
-            name: String::from_utf8(buf).unwrap(),
+            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
         }
     }
 }
+
+ewmh_get_property! {
+    request=GetWmName{
+        window: client_window,
+        property: _NET_WM_NAME,
+        xtype: UTF8_STRING
+    },
+    reply=GetWmNameReply,
+    cookie=GetWmNameCookie,
+    cookie_unchecked=GetWmNameCookieUnchecked
+}
+
+pub struct SetWmName {
+    window: xcb::x::Window,
+    data: Vec<u8>,
+}
+
+impl SetWmName {
+    pub fn new(connection: &Connection, window: xcb::x::Window, name: &str) -> SetWmName {
+        SetWmName {
+            window: window,
+            data: strings_to_x_buffer(vec![name]),
+        }
+    }
+}
+
+ewmh_set_property! {
+    request=SetWmName{
+        window: client_window,
+        property: _NET_WM_NAME,
+        xtype: UTF8_STRING
+    }
+}
+
 // }}}
 
 // _NET_WM_VISIBLE_NAME, UTF8_STRING
 // {{{
-ewmh_get_window_request! {
-    GetWmVisibleName,
-    _NET_WM_VISIBLE_NAME,
-    UTF8_STRING,
-    GetWmVisibleNameCooke,
-    GetWmVisibleNameCookieUnchecked,
-    GetWmVisibleNameReply
-}
+pub struct GetWmVisibleName(xcb::x::Window);
+pub struct GetWmVisibleNameCookie(xcb::x::GetPropertyCookie);
+pub struct GetWmVisibleNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
 
 #[derive(Debug)]
 pub struct GetWmVisibleNameReply {
@@ -58,31 +75,29 @@ pub struct GetWmVisibleNameReply {
 
 impl From<xcb::x::GetPropertyReply> for GetWmVisibleNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
-        let mut buf = vec![];
-
-        for b in reply.value::<u8>() {
-            if *b != 0x00 {
-                buf.push(*b)
-            }
-        }
-
         GetWmVisibleNameReply {
-            name: String::from_utf8(buf).unwrap(),
+            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
         }
     }
+}
+
+ewmh_get_property! {
+    request=GetWmVisibleName{
+        window: root_window,
+        property: _NET_WM_VISIBLE_NAME,
+        xtype: UTF8_STRING
+    },
+    reply=GetWmVisibleNameReply,
+    cookie=GetWmVisibleNameCookie,
+    cookie_unchecked=GetWmVisibleNameCookieUnchecked
 }
 // }}}
 
 // _NET_WM_ICON_NAME, UTF8_STRING
 // {{{
-ewmh_get_window_request! {
-    GetWmIconName,
-    _NET_WM_ICON_NAME,
-    UTF8_STRING,
-    GetWmIconNameCooke,
-    GetWmIconNameCookieUnchecked,
-    GetWmIconNameReply
-}
+pub struct GetWmIconName;
+pub struct GetWmIconNameCookie(xcb::x::GetPropertyCookie);
+pub struct GetWmIconNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
 
 #[derive(Debug)]
 pub struct GetWmIconNameReply {
@@ -91,31 +106,29 @@ pub struct GetWmIconNameReply {
 
 impl From<xcb::x::GetPropertyReply> for GetWmIconNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
-        let mut buf = vec![];
-
-        for b in reply.value::<u8>() {
-            if *b != 0x00 {
-                buf.push(*b)
-            }
-        }
-
         GetWmIconNameReply {
-            name: String::from_utf8(buf).unwrap(),
+            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
         }
     }
+}
+
+ewmh_get_property! {
+    request=GetWmIconName{
+        window: root_window,
+        property: _NET_WM_ICON_NAME,
+        xtype: UTF8_STRING
+    },
+    reply=GetWmIconNameReply,
+    cookie=GetWmIconNameCookie,
+    cookie_unchecked=GetWmIconNameCookieUnchecked
 }
 // }}}
 
 // _NET_WM_VISIBLE_ICON_NAME, UTF8_STRING
 // {{{
-ewmh_get_window_request! {
-    GetWmVisibleIconName,
-    _NET_WM_VISIBLE_ICON_NAME,
-    UTF8_STRING,
-    GetWmVisibleIconNameCooke,
-    GetWmVisibleIconNameCookieUnchecked,
-    GetWmVisibleIconNameReply
-}
+pub struct GetWmVisibleIconName;
+pub struct GetWmVisibleIconNameCookie(xcb::x::GetPropertyCookie);
+pub struct GetWmVisibleIconNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
 
 #[derive(Debug)]
 pub struct GetWmVisibleIconNameReply {
@@ -124,31 +137,29 @@ pub struct GetWmVisibleIconNameReply {
 
 impl From<xcb::x::GetPropertyReply> for GetWmVisibleIconNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
-        let mut buf = vec![];
-
-        for b in reply.value::<u8>() {
-            if *b != 0x00 {
-                buf.push(*b)
-            }
-        }
-
         GetWmVisibleIconNameReply {
-            name: String::from_utf8(buf).unwrap(),
+            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
         }
     }
+}
+
+ewmh_get_property! {
+    request=GetWmVisibleIconName{
+        window: root_window,
+        property: _NET_WM_VISIBLE_ICON_NAME,
+        xtype: UTF8_STRING
+    },
+    reply=GetWmVisibleIconNameReply,
+    cookie=GetWmVisibleIconNameCookie,
+    cookie_unchecked=GetWmVisibleIconNameCookieUnchecked
 }
 // }}}
 
 // _NET_WM_DESKTOP, CARDINAL/32
 // {{{
-ewmh_get_window_request! {
-    GetWmDesktop,
-    _NET_WM_DESKTOP,
-    CARDINAL,
-    GetWmDesktopCooke,
-    GetWmDesktopCookieUnchecked,
-    GetWmDesktopReply
-}
+pub struct GetWmDesktop;
+pub struct GetWmDesktopCookie(xcb::x::GetPropertyCookie);
+pub struct GetWmDesktopCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
 
 #[derive(Debug)]
 pub struct GetWmDesktopReply {
@@ -162,10 +173,91 @@ impl From<xcb::x::GetPropertyReply> for GetWmDesktopReply {
         }
     }
 }
+
+ewmh_get_property! {
+    request=GetWmDesktop{
+        window: root_window,
+        property: _NET_WM_DESKTOP,
+        xtype: ATOM_CARDINAL
+    },
+    reply=GetWmDesktopReply,
+    cookie=GetWmDesktopCookie,
+    cookie_unchecked=GetWmDesktopCookieUnchecked
+}
+
+pub struct SetWmDesktop {
+    window: xcb::x::Window,
+    data: Vec<u32>,
+}
+
+impl SetWmDesktop {
+    pub fn new(window: xcb::x::Window, desktop: u32) -> SetWmDesktop {
+        SetWmDesktop {
+            window: window,
+            data: vec![desktop],
+        }
+    }
+}
+
+ewmh_set_property! {
+    request=SetWmDesktop {
+        window: client_window,
+        property: _NET_WM_DESKTOP,
+        xtype: ATOM_CARDINAL
+    }
+}
+
+pub struct SendWmDesktop {
+    client_message: xcb::x::ClientMessageEvent,
+}
+
+impl SendWmDesktop {
+    pub fn new(connection: &Connection, desktop: u32, source_indication: u32) -> SendWmDesktop {
+        SendWmDesktop {
+            client_message: xcb::x::ClientMessageEvent::new(
+                connection.con.get_setup().roots().next().unwrap().root(),
+                connection.atoms._NET_WM_DESKTOP,
+                xcb::x::ClientMessageData::Data32([desktop, source_indication, 0x00, 0x00, 0x00]),
+            ),
+        }
+    }
+}
+
+ewmh_client_message! {
+    request=SendWmDesktop{destination: root_window}
+}
 // }}}
 
 // _NET_WM_WINDOW_TYPE, ATOM[]/32
 // {{{
+
+pub struct GetWmWindowType;
+pub struct GetWmWindowTypeCookie(xcb::x::GetPropertyCookie);
+pub struct GetWmWindowTypeCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
+
+#[derive(Debug)]
+pub struct GetWmWindowTypeReply {
+    pub window_types: Vec<xcb::x::Atom>,
+}
+
+impl From<xcb::x::GetPropertyReply> for GetWmWindowTypeReply {
+    fn from(reply: xcb::x::GetPropertyReply) -> Self {
+        GetWmWindowTypeReply {
+            window_types: reply.value::<xcb::x::Atom>().into(),
+        }
+    }
+}
+
+ewmh_get_property! {
+    request=GetWmWindowType{
+        window: root_window,
+        property: _NET_WM_WINDOW_TYPE,
+        xtype: ATOM_ATOM
+    },
+    reply=GetWmWindowTypeReply,
+    cookie=GetWmWindowTypeCookie,
+    cookie_unchecked=GetWmWindowTypeCookieUnchecked
+}
 
 pub struct SetWmWindowType {
     window: xcb::x::Window,
@@ -181,31 +273,11 @@ impl SetWmWindowType {
     }
 }
 
-ewmh_set_window_request! {
-    SetWmWindowType,
-    _NET_WM_WINDOW_TYPE,
-    { xcb::x::ATOM_ATOM }
-}
-
-ewmh_get_window_request! {
-    GetWmWindowType,
-    _NET_WM_WINDOW_TYPE,
-    ATOM,
-    GetWmWindowTypeCooke,
-    GetWmWindowTypeCookieUnchecked,
-    GetWmWindowTypeReply
-}
-
-#[derive(Debug)]
-pub struct GetWmWindowTypeReply {
-    pub types: Vec<xcb::x::Atom>,
-}
-
-impl From<xcb::x::GetPropertyReply> for GetWmWindowTypeReply {
-    fn from(reply: xcb::x::GetPropertyReply) -> Self {
-        GetWmWindowTypeReply {
-            types: reply.value::<xcb::x::Atom>().into(),
-        }
+ewmh_set_property! {
+    request=SetWmWindowType{
+        window: client_window,
+        property: _NET_WM_WINDOW_TYPE,
+        xtype: ATOM_ATOM
     }
 }
 
@@ -214,46 +286,65 @@ impl From<xcb::x::GetPropertyReply> for GetWmWindowTypeReply {
 // _NET_WM_STATE, ATOM[]/32
 // {{{
 
-pub struct SetWmState {
-    window: xcb::x::Window,
-    data: Vec<xcb::x::Atom>,
-}
-
-impl SetWmState {
-    pub fn new(window: xcb::x::Window, types: Vec<xcb::x::Atom>) -> SetWmState {
-        SetWmState {
-            window,
-            data: types,
-        }
-    }
-}
-
-ewmh_set_window_request! {
-    SetWmState,
-    _NET_WM_STATE,
-    { xcb::x::ATOM_ATOM }
-}
-
-ewmh_get_window_request! {
-    GetWmState,
-    _NET_WM_STATE,
-    ATOM,
-    GetWmStateCooke,
-    GetWmStateCookieUnchecked,
-    GetWmStateReply
-}
+pub struct GetWmState(xcb::x::Window);
+pub struct GetWmStateCookie(xcb::x::GetPropertyCookie);
+pub struct GetWmStateCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
 
 #[derive(Debug)]
 pub struct GetWmStateReply {
-    pub types: Vec<xcb::x::Atom>,
+    pub states: Vec<xcb::x::Atom>,
 }
 
 impl From<xcb::x::GetPropertyReply> for GetWmStateReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmStateReply {
-            types: reply.value::<xcb::x::Atom>().into(),
+            states: reply.value::<xcb::x::Atom>().into(),
         }
     }
 }
 
+ewmh_get_property! {
+    request=GetWmState{
+        window: client_window,
+        property: _NET_WM_STATE,
+        xtype: ATOM_ATOM
+    },
+    reply=GetWmStateReply,
+    cookie=GetWmStateCookie,
+    cookie_unchecked=GetWmStateCookieUnchecked
+}
+
+pub struct SetWmState {
+    client_message: xcb::x::ClientMessageEvent,
+}
+
+impl SetWmState {
+    pub fn new(
+        connection: &Connection,
+        window: xcb::x::Window,
+        action: xcb::x::PropMode,
+        states: [xcb::x::Atom; 2],
+        source_indication: u32,
+    ) -> SetWmState {
+        let data = [
+            unsafe { std::mem::transmute::<_, u32>(action) },
+            states[0].resource_id(),
+            states[1].resource_id(),
+            source_indication,
+            0x00,
+        ];
+
+        SetWmState {
+            client_message: xcb::x::ClientMessageEvent::new(
+                window,
+                connection.atoms._NET_WM_DESKTOP,
+                xcb::x::ClientMessageData::Data32(data),
+            ),
+        }
+    }
+}
+
+ewmh_client_message! {
+    request=SetWmState{destination: root_window}
+}
 // }}}

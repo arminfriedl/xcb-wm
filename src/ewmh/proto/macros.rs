@@ -49,11 +49,11 @@ macro_rules! _get_property_request {
         }
     };
 
-    ($window:ident, $property:ident, UTF8_STRING) => {
+    (client_window, $property:ident, UTF8_STRING) => {
         fn xcb_request(&self, con: &Connection) -> xcb::x::GetProperty {
             xcb::x::GetProperty {
                 delete: false,
-                window: $window,
+                window: self.0,
                 property: con.atoms.$property,
                 r#type: con.atoms.UTF8_STRING,
                 long_offset: 0,
@@ -62,11 +62,11 @@ macro_rules! _get_property_request {
         }
     };
 
-    ($window:ident, $property:ident, $xtype:ident) => {
+    (client_window, $property:ident, $xtype:ident) => {
         fn xcb_request(&self, con: &Connection) -> xcb::x::GetProperty {
             xcb::x::GetProperty {
                 delete: false,
-                window: $window,
+                window: self.0,
                 property: con.atoms.$property,
                 r#type: xcb::x::$xtype,
                 long_offset: 0,
@@ -126,7 +126,7 @@ macro_rules! _set_property_base {
     };
 
     (root_window, $property:ident, $xtype:ident) => {
-        fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
+        fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u32> {
             xcb::x::ChangeProperty {
                 mode: xcb::x::PropMode::Replace,
                 window: con.con.get_setup().roots().next().unwrap().root(),
@@ -137,11 +137,11 @@ macro_rules! _set_property_base {
         }
     };
 
-    ($window:ident, $property:ident, UTF8_STRING) => {
+    (client_window, $property:ident, UTF8_STRING) => {
         fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
             xcb::x::ChangeProperty {
                 mode: xcb::x::PropMode::Replace,
-                window: $window,
+                window: self.window,
                 property: con.atoms.$property,
                 r#type: con.atoms.UTF8_STRING,
                 data: &self.data,
@@ -149,13 +149,25 @@ macro_rules! _set_property_base {
         }
     };
 
-    ($window:ident, $property:ident, $xtype:ident) => {
-        fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
+    (client_window, $property:ident, ATOM_CARDINAL) => {
+        fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u32> {
             xcb::x::ChangeProperty {
                 mode: xcb::x::PropMode::Replace,
-                window: $window,
+                window: self.window,
                 property: con.atoms.$property,
-                r#type: xcb::x::$xtype,
+                r#type: xcb::x::ATOM_CARDINAL,
+                data: &self.data,
+            }
+        }
+    };
+
+    (client_window, $property:ident, ATOM_ATOM) => {
+        fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, xcb::x::Atom> {
+            xcb::x::ChangeProperty {
+                mode: xcb::x::PropMode::Replace,
+                window: self.window,
+                property: con.atoms.$property,
+                r#type: xcb::x::ATOM_ATOM,
                 data: &self.data,
             }
         }
@@ -166,14 +178,13 @@ macro_rules! ewmh_set_property {
     (request=$request:ident{
         window: $window:ident,
         property: $property:ident,
-        xtype: $xtype: ident
+        xtype: UTF8_STRING
      }) => {
         impl<'a> EwmhRequest<'a> for $request {
-            // TODO fixing to u8 is probably not flexible enough
             type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
             type EwmhCookie = xcb::VoidCookie;
 
-            _set_property_base! {$window, $property, $xtype}
+            _set_property_base! {$window, $property, UTF8_STRING}
 
             fn convert_cookie(&'a self, xcb_cookie: xcb::VoidCookie) -> Self::EwmhCookie {
                 xcb_cookie
@@ -183,7 +194,53 @@ macro_rules! ewmh_set_property {
         impl<'a> EwmhVoidRequestChecked<'a> for $request {
             type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
 
-            _set_property_base! {$window, $property, $xtype}
+            _set_property_base! {$window, $property, UTF8_STRING}
+        }
+    };
+
+    (request=$request:ident{
+        window: $window:ident,
+        property: $property:ident,
+        xtype: ATOM_CARDINAL
+     }) => {
+        impl<'a> EwmhRequest<'a> for $request {
+            type XcbRequest = xcb::x::ChangeProperty<'a, u32>;
+            type EwmhCookie = xcb::VoidCookie;
+
+            _set_property_base! {$window, $property, ATOM_CARDINAL}
+
+            fn convert_cookie(&'a self, xcb_cookie: xcb::VoidCookie) -> Self::EwmhCookie {
+                xcb_cookie
+            }
+        }
+
+        impl<'a> EwmhVoidRequestChecked<'a> for $request {
+            type XcbRequest = xcb::x::ChangeProperty<'a, u32>;
+
+            _set_property_base! {$window, $property, ATOM_CARDINAL}
+        }
+    };
+
+    (request=$request:ident{
+        window: $window:ident,
+        property: $property:ident,
+        xtype: ATOM_ATOM
+     }) => {
+        impl<'a> EwmhRequest<'a> for $request {
+            type XcbRequest = xcb::x::ChangeProperty<'a, xcb::x::Atom>;
+            type EwmhCookie = xcb::VoidCookie;
+
+            _set_property_base! {$window, $property, ATOM_ATOM }
+
+            fn convert_cookie(&'a self, xcb_cookie: xcb::VoidCookie) -> Self::EwmhCookie {
+                xcb_cookie
+            }
+        }
+
+        impl<'a> EwmhVoidRequestChecked<'a> for $request {
+            type XcbRequest = xcb::x::ChangeProperty<'a, xcb::x::Atom>;
+
+            _set_property_base! {$window, $property, ATOM_ATOM }
         }
     };
 }

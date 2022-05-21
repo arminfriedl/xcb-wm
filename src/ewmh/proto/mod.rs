@@ -17,8 +17,10 @@
 #[macro_use]
 mod macros;
 
-mod test_props;
+pub(crate) mod util;
 
-pub use test_props::net_desktop_names::*;
-pub use test_props::net_showing_desktop::*;
-pub use test_props::net_supported::*;
+mod root_props;
+pub use root_props::*;
+
+mod application_props;
+pub use application_props::*;
