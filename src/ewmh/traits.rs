@@ -9,7 +9,7 @@ use crate::ewmh::connection::Connection;
 ///
 /// This is a bit mind-bending and makes these traits hard to grasp. This was however done to align
 /// with how the parent [`xcb`] crate works.
-pub(crate) trait EwmhRequest<'a> {
+pub trait EwmhRequest<'a> {
     /// The underlying [`xcb::Request`] used to do the actual heavy lifting
     type XcbRequest: xcb::Request;
 
@@ -43,7 +43,7 @@ pub(crate) trait EwmhRequest<'a> {
 /// > errors using Connection::check_request.
 ///
 /// For [`xcb-wm`] this means either `SetProperty` or `ClientMessage` requests.
-pub(crate) trait EwmhVoidRequestChecked<'a> {
+pub trait EwmhVoidRequestChecked<'a> {
     type XcbRequest: xcb::RequestWithoutReply;
 
     /// Construct the [`xcb::Request`]. This is implementation specific.
@@ -69,7 +69,7 @@ pub(crate) trait EwmhVoidRequestChecked<'a> {
 /// > be sent to the event loop
 ///
 /// For [`xcb-wm`] this means a `GetProperty` requests.
-pub(crate) trait EwmhPropertyRequestUnchecked {
+pub trait EwmhPropertyRequestUnchecked {
     type EwmhCookie: EwmhPropertyCookieUnchecked;
 
     /// Construct the [`xcb::Request`]. This is implementation specific.
@@ -99,7 +99,7 @@ pub(crate) trait EwmhPropertyRequestUnchecked {
 ///
 /// At the same time it may have a _response_ for reply requests or it
 /// may have no _response_ for void requests.
-pub(crate) trait EwmhCookie {
+pub trait EwmhCookie {
     /// The wrapped [`xcb::Cookie`]
     type XcbCookie: xcb::Cookie;
 }
@@ -119,7 +119,7 @@ impl EwmhCookie for xcb::VoidCookie {
 /// This is needed for 2 purposes:
 /// - Carry the reply type from the request to the retrieval of the response
 /// - Restrict the methods that can be called with it, i.e. [`Connection::wait_for_reply`]
-pub(crate) trait EwmhPropertyCookieChecked {
+pub trait EwmhPropertyCookieChecked {
     type Reply: EwmhPropertyReply;
 
     /// Retrieve the inner [`xcb::Cookie`]
@@ -134,7 +134,7 @@ pub(crate) trait EwmhPropertyCookieChecked {
 /// This is needed for 2 purposes:
 /// - Carry the reply type from the request to the retrieval of the response
 /// - Restrict the methods that can be called with it, i.e. [`Connection::wait_for_reply_unchecked`]
-pub(crate) trait EwmhPropertyCookieUnchecked {
+pub trait EwmhPropertyCookieUnchecked {
     type Reply: EwmhPropertyReply;
 
     /// Retrieve the inner [`xcb::Cookie`]
@@ -152,5 +152,5 @@ pub(crate) trait EwmhPropertyCookieUnchecked {
 ///
 /// The connection between a ewmh request and the reply struct is made via ewmh property cookies
 /// ([`EwmhPropertyCookieChecked`] and [`EwmhPropertyCookieUnchecked`]
-pub(crate) trait EwmhPropertyReply: From<xcb::x::GetPropertyReply> {}
+pub trait EwmhPropertyReply: From<xcb::x::GetPropertyReply> {}
 impl<T> EwmhPropertyReply for T where T: From<xcb::x::GetPropertyReply> {}

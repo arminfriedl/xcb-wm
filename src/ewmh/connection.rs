@@ -33,28 +33,28 @@ impl<'a> Connection<'a> {
         }
     }
 
-    fn send_request<'b, R>(&self, request: &'b R) -> R::EwmhCookie
+    pub fn send_request<'b, R>(&self, request: &'b R) -> R::EwmhCookie
     where
         R: EwmhRequest<'b>,
     {
         request.send(self)
     }
 
-    fn send_request_checked<'b, R>(&self, request: &'b R) -> xcb::VoidCookieChecked
+    pub fn send_request_checked<'b, R>(&self, request: &'b R) -> xcb::VoidCookieChecked
     where
         R: EwmhVoidRequestChecked<'b>,
     {
         request.send(self)
     }
 
-    fn send_request_unchecked<R>(&self, request: &R) -> R::EwmhCookie
+    pub fn send_request_unchecked<R>(&self, request: &R) -> R::EwmhCookie
     where
         R: EwmhPropertyRequestUnchecked,
     {
         request.send(self)
     }
 
-    fn wait_for_reply<C>(&self, cookie: C) -> C::Reply
+    pub fn wait_for_reply<C>(&self, cookie: C) -> C::Reply
     where
         C: EwmhPropertyCookieChecked,
     {
@@ -62,7 +62,7 @@ impl<'a> Connection<'a> {
         xcb_reply.unwrap().into()
     }
 
-    fn wait_for_reply_unchecked<C>(&self, cookie: C) -> C::Reply
+    pub fn wait_for_reply_unchecked<C>(&self, cookie: C) -> C::Reply
     where
         C: EwmhPropertyCookieUnchecked,
     {

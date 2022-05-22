@@ -109,13 +109,13 @@ ewmh_get_property! {
     reply=GetNumberOfDesktopsReply
 }
 
-pub struct SetNumberOfDesktops {
+pub struct SendNumberOfDesktops {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl SetNumberOfDesktops {
-    pub fn new(connection: &Connection, desktops: u32) -> SetNumberOfDesktops {
-        SetNumberOfDesktops {
+impl SendNumberOfDesktops {
+    pub fn new(connection: &Connection, desktops: u32) -> SendNumberOfDesktops {
+        SendNumberOfDesktops {
             client_message: xcb::x::ClientMessageEvent::new(
                 connection.con.get_setup().roots().next().unwrap().root(),
                 connection.atoms._NET_NUMBER_OF_DESKTOPS,
@@ -126,7 +126,7 @@ impl SetNumberOfDesktops {
 }
 
 ewmh_client_message! {
-    request=SetNumberOfDesktops{destination: root}
+    request=SendNumberOfDesktops{destination: root}
 }
 // }}}
 
@@ -156,13 +156,13 @@ ewmh_get_property! {
     reply=GetDesktopGeometryReply
 }
 
-pub struct SetDesktopGeometry {
+pub struct SendDesktopGeometry {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl SetDesktopGeometry {
-    pub fn new(connection: &Connection, width: u32, height: u32) -> SetDesktopGeometry {
-        SetDesktopGeometry {
+impl SendDesktopGeometry {
+    pub fn new(connection: &Connection, width: u32, height: u32) -> SendDesktopGeometry {
+        SendDesktopGeometry {
             client_message: xcb::x::ClientMessageEvent::new(
                 connection.con.get_setup().roots().next().unwrap().root(),
                 connection.atoms._NET_DESKTOP_GEOMETRY,
@@ -173,9 +173,8 @@ impl SetDesktopGeometry {
 }
 
 ewmh_client_message! {
-    request=SetDesktopGeometry{destination: root}
+    request=SendDesktopGeometry{destination: root}
 }
-
 // }}}
 
 // _NET_DESTKOP_VIEWPORT x, y, CARDINAL[][2]/32
@@ -204,13 +203,13 @@ ewmh_get_property! {
     reply=GetDesktopViewportReply
 }
 
-pub struct SetDesktopViewport {
+pub struct SendDesktopViewport {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl SetDesktopViewport {
-    pub fn new(connection: &Connection, x: u32, y: u32) -> SetDesktopViewport {
-        SetDesktopViewport {
+impl SendDesktopViewport {
+    pub fn new(connection: &Connection, x: u32, y: u32) -> SendDesktopViewport {
+        SendDesktopViewport {
             client_message: xcb::x::ClientMessageEvent::new(
                 connection.con.get_setup().roots().next().unwrap().root(),
                 connection.atoms._NET_DESKTOP_VIEWPORT,
@@ -221,7 +220,7 @@ impl SetDesktopViewport {
 }
 
 ewmh_client_message! {
-    request=SetDesktopViewport{destination: root}
+    request=SendDesktopViewport{destination: root}
 }
 // }}}
 
@@ -249,13 +248,13 @@ ewmh_get_property! {
     reply=GetCurrentDesktopReply
 }
 
-pub struct SetCurrentDesktop {
+pub struct SendCurrentDesktop {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl SetCurrentDesktop {
-    pub fn new(connection: &Connection, desktop: u32) -> SetCurrentDesktop {
-        SetCurrentDesktop {
+impl SendCurrentDesktop {
+    pub fn new(connection: &Connection, desktop: u32) -> SendCurrentDesktop {
+        SendCurrentDesktop {
             client_message: xcb::x::ClientMessageEvent::new(
                 connection.con.get_setup().roots().next().unwrap().root(),
                 connection.atoms._NET_CURRENT_DESKTOP,
@@ -266,7 +265,7 @@ impl SetCurrentDesktop {
 }
 
 ewmh_client_message! {
-    request=SetCurrentDesktop{destination: root}
+    request=SendCurrentDesktop{destination: root}
 }
 // }}}
 
@@ -339,19 +338,19 @@ ewmh_get_property! {
     reply=GetActiveWindowReply
 }
 
-pub struct SetActiveWindow {
+pub struct SendActiveWindow {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl SetActiveWindow {
+impl SendActiveWindow {
     pub fn new(
         connection: &Connection,
         window: xcb::x::Window,
         source_indication: u32,
         timestamp: u32,
         requestor_window: Option<xcb::x::Window>,
-    ) -> SetActiveWindow {
-        SetActiveWindow {
+    ) -> SendActiveWindow {
+        SendActiveWindow {
             client_message: xcb::x::ClientMessageEvent::new(
                 window,
                 connection.atoms._NET_ACTIVE_WINDOW,
@@ -368,7 +367,7 @@ impl SetActiveWindow {
 }
 
 ewmh_client_message! {
-    request=SetActiveWindow{destination: root}
+    request=SendActiveWindow{destination: root}
 }
 // }}}
 
@@ -533,18 +532,18 @@ ewmh_client_message! {
 
 // _NET_CLOSE_WINDOW
 // {{{
-pub struct CloseWindow {
+pub struct SendCloseWindow {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl CloseWindow {
+impl SendCloseWindow {
     pub fn new(
         connection: &Connection,
         window: xcb::x::Window,
         source_indication: u32,
         timestamp: u32,
-    ) -> CloseWindow {
-        CloseWindow {
+    ) -> SendCloseWindow {
+        SendCloseWindow {
             client_message: xcb::x::ClientMessageEvent::new(
                 window,
                 connection.atoms._NET_CLOSE_WINDOW,
@@ -555,7 +554,7 @@ impl CloseWindow {
 }
 
 ewmh_client_message! {
-    request=CloseWindow{destination: root}
+    request=SendCloseWindow{destination: root}
 }
 
 // // _NET_MOVERESIZE_WINDOW
@@ -581,13 +580,13 @@ ewmh_client_message! {
 //
 // _NET_REQUEST_FRAME_EXTENTS
 // {{{
-pub struct RequestFrameExtents {
+pub struct SendRequestFrameExtents {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl RequestFrameExtents {
-    pub fn new(connection: &Connection, window: xcb::x::Window) -> RequestFrameExtents {
-        RequestFrameExtents {
+impl SendRequestFrameExtents {
+    pub fn new(connection: &Connection, window: xcb::x::Window) -> SendRequestFrameExtents {
+        SendRequestFrameExtents {
             client_message: xcb::x::ClientMessageEvent::new(
                 window,
                 connection.atoms._NET_REQUEST_FRAME_EXTENTS,
@@ -598,6 +597,6 @@ impl RequestFrameExtents {
 }
 
 ewmh_client_message! {
-    request=RequestFrameExtents{destination: root}
+    request=SendRequestFrameExtents{destination: root}
 }
 // }}}

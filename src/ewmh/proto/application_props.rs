@@ -274,18 +274,18 @@ ewmh_get_property! {
     reply=GetWmStateReply
 }
 
-pub struct SetWmState {
+pub struct SendWmState {
     client_message: xcb::x::ClientMessageEvent,
 }
 
-impl SetWmState {
+impl SendWmState {
     pub fn new(
         connection: &Connection,
         window: xcb::x::Window,
         action: xcb::x::PropMode,
         states: [xcb::x::Atom; 2],
         source_indication: u32,
-    ) -> SetWmState {
+    ) -> SendWmState {
         let data = [
             unsafe { std::mem::transmute::<_, u32>(action) },
             states[0].resource_id(),
@@ -294,7 +294,7 @@ impl SetWmState {
             0x00,
         ];
 
-        SetWmState {
+        SendWmState {
             client_message: xcb::x::ClientMessageEvent::new(
                 window,
                 connection.atoms._NET_WM_DESKTOP,
@@ -305,6 +305,6 @@ impl SetWmState {
 }
 
 ewmh_client_message! {
-    request=SetWmState{destination: root}
+    request=SendWmState{destination: root}
 }
 // }}}
