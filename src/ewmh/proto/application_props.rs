@@ -2,7 +2,9 @@
 //!
 //! see: <https://specifications.freedesktop.org/wm-spec/wm-spec-1.5.html#idm45446104426048>
 
-use xcb::{Xid, XidNew};
+#![allow(dead_code)]
+
+use xcb::Xid;
 
 use crate::ewmh::proto::util::{strings_to_x_buffer, x_buffer_to_strings};
 use crate::ewmh::traits::*;
@@ -40,7 +42,7 @@ pub struct SetWmName {
 }
 
 impl SetWmName {
-    pub fn new(connection: &Connection, window: xcb::x::Window, name: &str) -> SetWmName {
+    pub fn new(window: xcb::x::Window, name: &str) -> SetWmName {
         SetWmName {
             window: window,
             data: strings_to_x_buffer(vec![name]),
@@ -50,7 +52,7 @@ impl SetWmName {
 
 ewmh_set_property! {
     request=SetWmName{
-        window: client_window,
+        window: client,
         property: _NET_WM_NAME,
         xtype: UTF8_STRING
     }
@@ -173,7 +175,7 @@ impl SetWmDesktop {
 
 ewmh_set_property! {
     request=SetWmDesktop {
-        window: client_window,
+        window: client,
         property: _NET_WM_DESKTOP,
         xtype: ATOM_CARDINAL
     }
@@ -196,7 +198,7 @@ impl SendWmDesktop {
 }
 
 ewmh_client_message! {
-    request=SendWmDesktop{destination: root_window}
+    request=SendWmDesktop{destination: root}
 }
 // }}}
 
@@ -240,7 +242,7 @@ impl SetWmWindowType {
 
 ewmh_set_property! {
     request=SetWmWindowType{
-        window: client_window,
+        window: client,
         property: _NET_WM_WINDOW_TYPE,
         xtype: ATOM_ATOM
     }
@@ -303,6 +305,6 @@ impl SetWmState {
 }
 
 ewmh_client_message! {
-    request=SetWmState{destination: root_window}
+    request=SetWmState{destination: root}
 }
 // }}}

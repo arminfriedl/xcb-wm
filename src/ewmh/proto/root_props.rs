@@ -81,7 +81,7 @@ ewmh_get_property! {
         property: _NET_CLIENT_LIST_STACKING,
         xtype: ATOM_WINDOW
     },
-    reply=GetClientListStackingReply,
+    reply=GetClientListStackingReply
 }
 // }}}
 
@@ -126,7 +126,7 @@ impl SetNumberOfDesktops {
 }
 
 ewmh_client_message! {
-    request=SetNumberOfDesktops{destination: root_window}
+    request=SetNumberOfDesktops{destination: root}
 }
 // }}}
 
@@ -173,7 +173,7 @@ impl SetDesktopGeometry {
 }
 
 ewmh_client_message! {
-    request=SetDesktopGeometry{destination: root_window}
+    request=SetDesktopGeometry{destination: root}
 }
 
 // }}}
@@ -221,7 +221,7 @@ impl SetDesktopViewport {
 }
 
 ewmh_client_message! {
-    request=SetDesktopViewport{destination: root_window}
+    request=SetDesktopViewport{destination: root}
 }
 // }}}
 
@@ -266,7 +266,7 @@ impl SetCurrentDesktop {
 }
 
 ewmh_client_message! {
-    request=SetCurrentDesktop{destination: root_window}
+    request=SetCurrentDesktop{destination: root}
 }
 // }}}
 
@@ -308,7 +308,7 @@ impl SetDesktopNames {
 
 ewmh_set_property! {
     request=SetDesktopNames{
-        window: root_window,
+        window: root,
         property: _NET_DESKTOP_NAMES,
         xtype: UTF8_STRING
     }
@@ -368,7 +368,7 @@ impl SetActiveWindow {
 }
 
 ewmh_client_message! {
-    request=SetActiveWindow{destination: root_window}
+    request=SetActiveWindow{destination: root}
 }
 // }}}
 
@@ -494,11 +494,7 @@ pub struct GetShowingDesktopReply {
 impl From<xcb::x::GetPropertyReply> for GetShowingDesktopReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetShowingDesktopReply {
-            is_showing_desktop: if reply.value::<u32>()[0] == 1 {
-                true
-            } else {
-                false
-            },
+            is_showing_desktop: { reply.value::<u32>()[0] == 1 },
         }
     }
 }
@@ -531,7 +527,7 @@ impl SetShowingDesktop {
 }
 
 ewmh_client_message! {
-    request=SetShowingDesktop{destination: root_window}
+    request=SetShowingDesktop{destination: root}
 }
 // }}}
 
@@ -559,7 +555,7 @@ impl CloseWindow {
 }
 
 ewmh_client_message! {
-    request=CloseWindow{destination: root_window}
+    request=CloseWindow{destination: root}
 }
 
 // // _NET_MOVERESIZE_WINDOW
@@ -602,6 +598,6 @@ impl RequestFrameExtents {
 }
 
 ewmh_client_message! {
-    request=RequestFrameExtents{destination: root_window}
+    request=RequestFrameExtents{destination: root}
 }
 // }}}
