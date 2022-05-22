@@ -8,12 +8,10 @@ use crate::ewmh::proto::util::{strings_to_x_buffer, x_buffer_to_strings};
 use crate::ewmh::traits::*;
 use crate::ewmh::Connection;
 
+use paste::paste; // Needed for macros
+
 // _NET_WM_NAME, UTF8_STRING
 // {{{
-pub struct GetWmName(xcb::x::Window);
-pub struct GetWmNameCookie(xcb::x::GetPropertyCookie);
-pub struct GetWmNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWmNameReply {
     pub name: String,
@@ -29,13 +27,11 @@ impl From<xcb::x::GetPropertyReply> for GetWmNameReply {
 
 ewmh_get_property! {
     request=GetWmName{
-        window: client_window,
+        window: client,
         property: _NET_WM_NAME,
         xtype: UTF8_STRING
     },
-    reply=GetWmNameReply,
-    cookie=GetWmNameCookie,
-    cookie_unchecked=GetWmNameCookieUnchecked
+    reply=GetWmNameReply
 }
 
 pub struct SetWmName {
@@ -64,10 +60,6 @@ ewmh_set_property! {
 
 // _NET_WM_VISIBLE_NAME, UTF8_STRING
 // {{{
-pub struct GetWmVisibleName(xcb::x::Window);
-pub struct GetWmVisibleNameCookie(xcb::x::GetPropertyCookie);
-pub struct GetWmVisibleNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWmVisibleNameReply {
     pub name: String,
@@ -83,22 +75,16 @@ impl From<xcb::x::GetPropertyReply> for GetWmVisibleNameReply {
 
 ewmh_get_property! {
     request=GetWmVisibleName{
-        window: root_window,
+        window: client,
         property: _NET_WM_VISIBLE_NAME,
         xtype: UTF8_STRING
     },
-    reply=GetWmVisibleNameReply,
-    cookie=GetWmVisibleNameCookie,
-    cookie_unchecked=GetWmVisibleNameCookieUnchecked
+    reply=GetWmVisibleNameReply
 }
 // }}}
 
 // _NET_WM_ICON_NAME, UTF8_STRING
 // {{{
-pub struct GetWmIconName;
-pub struct GetWmIconNameCookie(xcb::x::GetPropertyCookie);
-pub struct GetWmIconNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWmIconNameReply {
     pub name: String,
@@ -114,22 +100,16 @@ impl From<xcb::x::GetPropertyReply> for GetWmIconNameReply {
 
 ewmh_get_property! {
     request=GetWmIconName{
-        window: root_window,
+        window: client,
         property: _NET_WM_ICON_NAME,
         xtype: UTF8_STRING
     },
-    reply=GetWmIconNameReply,
-    cookie=GetWmIconNameCookie,
-    cookie_unchecked=GetWmIconNameCookieUnchecked
+    reply=GetWmIconNameReply
 }
 // }}}
 
 // _NET_WM_VISIBLE_ICON_NAME, UTF8_STRING
 // {{{
-pub struct GetWmVisibleIconName;
-pub struct GetWmVisibleIconNameCookie(xcb::x::GetPropertyCookie);
-pub struct GetWmVisibleIconNameCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWmVisibleIconNameReply {
     pub name: String,
@@ -145,22 +125,16 @@ impl From<xcb::x::GetPropertyReply> for GetWmVisibleIconNameReply {
 
 ewmh_get_property! {
     request=GetWmVisibleIconName{
-        window: root_window,
+        window: client,
         property: _NET_WM_VISIBLE_ICON_NAME,
         xtype: UTF8_STRING
     },
-    reply=GetWmVisibleIconNameReply,
-    cookie=GetWmVisibleIconNameCookie,
-    cookie_unchecked=GetWmVisibleIconNameCookieUnchecked
+    reply=GetWmVisibleIconNameReply
 }
 // }}}
 
 // _NET_WM_DESKTOP, CARDINAL/32
 // {{{
-pub struct GetWmDesktop;
-pub struct GetWmDesktopCookie(xcb::x::GetPropertyCookie);
-pub struct GetWmDesktopCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWmDesktopReply {
     pub desktop: u32,
@@ -176,13 +150,11 @@ impl From<xcb::x::GetPropertyReply> for GetWmDesktopReply {
 
 ewmh_get_property! {
     request=GetWmDesktop{
-        window: root_window,
+        window: client,
         property: _NET_WM_DESKTOP,
         xtype: ATOM_CARDINAL
     },
-    reply=GetWmDesktopReply,
-    cookie=GetWmDesktopCookie,
-    cookie_unchecked=GetWmDesktopCookieUnchecked
+    reply=GetWmDesktopReply
 }
 
 pub struct SetWmDesktop {
@@ -230,11 +202,6 @@ ewmh_client_message! {
 
 // _NET_WM_WINDOW_TYPE, ATOM[]/32
 // {{{
-
-pub struct GetWmWindowType;
-pub struct GetWmWindowTypeCookie(xcb::x::GetPropertyCookie);
-pub struct GetWmWindowTypeCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWmWindowTypeReply {
     pub window_types: Vec<xcb::x::Atom>,
@@ -250,13 +217,11 @@ impl From<xcb::x::GetPropertyReply> for GetWmWindowTypeReply {
 
 ewmh_get_property! {
     request=GetWmWindowType{
-        window: root_window,
+        window: client,
         property: _NET_WM_WINDOW_TYPE,
         xtype: ATOM_ATOM
     },
-    reply=GetWmWindowTypeReply,
-    cookie=GetWmWindowTypeCookie,
-    cookie_unchecked=GetWmWindowTypeCookieUnchecked
+    reply=GetWmWindowTypeReply
 }
 
 pub struct SetWmWindowType {
@@ -285,11 +250,6 @@ ewmh_set_property! {
 
 // _NET_WM_STATE, ATOM[]/32
 // {{{
-
-pub struct GetWmState(xcb::x::Window);
-pub struct GetWmStateCookie(xcb::x::GetPropertyCookie);
-pub struct GetWmStateCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWmStateReply {
     pub states: Vec<xcb::x::Atom>,
@@ -305,13 +265,11 @@ impl From<xcb::x::GetPropertyReply> for GetWmStateReply {
 
 ewmh_get_property! {
     request=GetWmState{
-        window: client_window,
+        window: client,
         property: _NET_WM_STATE,
         xtype: ATOM_ATOM
     },
-    reply=GetWmStateReply,
-    cookie=GetWmStateCookie,
-    cookie_unchecked=GetWmStateCookieUnchecked
+    reply=GetWmStateReply
 }
 
 pub struct SetWmState {

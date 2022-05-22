@@ -8,14 +8,10 @@ use crate::ewmh::proto::util::{strings_to_x_buffer, x_buffer_to_strings};
 use crate::ewmh::traits::*;
 use crate::ewmh::Connection;
 
+use paste::paste; // Needed for macros
+
 // _NET_SUPPORTED, ATOM[]/32
 // {{{
-pub struct GetSupported;
-
-pub struct GetSupportedCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetSupportedCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetSupportedReply {
     pub atoms: Vec<xcb::x::Atom>,
@@ -31,24 +27,16 @@ impl From<xcb::x::GetPropertyReply> for GetSupportedReply {
 
 ewmh_get_property! {
     request=GetSupported{
-        window: root_window,
+        window: root,
         property: _NET_SUPPORTED,
         xtype: ATOM_ATOM
     },
-    reply=GetSupportedReply,
-    cookie=GetSupportedCookie,
-    cookie_unchecked=GetSupportedCookieUnchecked
+    reply=GetSupportedReply
 }
 // }}}
 
 // _NET_CLIENT_LIST, WINDOW[]/32
 // {{{
-pub struct GetClientList;
-
-pub struct GetClientListCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetClientListCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetClientListReply {
     pub clients: Vec<xcb::x::Window>,
@@ -64,24 +52,16 @@ impl From<xcb::x::GetPropertyReply> for GetClientListReply {
 
 ewmh_get_property! {
     request=GetClientList{
-        window: root_window,
+        window: root,
         property: _NET_CLIENT_LIST,
         xtype: ATOM_WINDOW
     },
-    reply=GetClientListReply,
-    cookie=GetClientListCookie,
-    cookie_unchecked=GetClientListCookieUnchecked
+    reply=GetClientListReply
 }
 // }}}
 
 // _NET_CLIENT_LIST_STACKING, WINDOW[]/32
 // {{{
-pub struct GetClientListStacking;
-
-pub struct GetClientListStackingCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetClientListStackingCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetClientListStackingReply {
     pub clients: Vec<xcb::x::Window>,
@@ -97,24 +77,16 @@ impl From<xcb::x::GetPropertyReply> for GetClientListStackingReply {
 
 ewmh_get_property! {
     request=GetClientListStacking{
-        window: root_window,
+        window: root,
         property: _NET_CLIENT_LIST_STACKING,
         xtype: ATOM_WINDOW
     },
     reply=GetClientListStackingReply,
-    cookie=GetClientListStackingCookie,
-    cookie_unchecked=GetClientListStackingCookieUnchecked
 }
 // }}}
 
 // _NET_NUMBER_OF_DESKTOPS, CARDINAL/32
 // {{{
-pub struct GetNumberOfDesktops;
-
-pub struct GetNumberOfDesktopsCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetNumberOfDesktopsCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetNumberOfDesktopsReply {
     pub desktops: u32,
@@ -130,13 +102,11 @@ impl From<xcb::x::GetPropertyReply> for GetNumberOfDesktopsReply {
 
 ewmh_get_property! {
     request=GetNumberOfDesktops{
-        window: root_window,
+        window: root,
         property: _NET_NUMBER_OF_DESKTOPS,
         xtype: ATOM_CARDINAL
     },
-    reply=GetNumberOfDesktopsReply,
-    cookie=GetNumberOfDesktopsCookie,
-    cookie_unchecked=GetNumberOfDesktopsCookieUnchecked
+    reply=GetNumberOfDesktopsReply
 }
 
 pub struct SetNumberOfDesktops {
@@ -162,12 +132,6 @@ ewmh_client_message! {
 
 // _NET_DESKTOP_GEOMETRY width, height, CARDINAL[2]/32
 // {{{
-pub struct GetDesktopGeometry;
-
-pub struct GetDesktopGeometryCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetDesktopGeometryCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetDesktopGeometryReply {
     pub width: u32,
@@ -185,13 +149,11 @@ impl From<xcb::x::GetPropertyReply> for GetDesktopGeometryReply {
 
 ewmh_get_property! {
     request=GetDesktopGeometry{
-        window: root_window,
+        window: root,
         property: _NET_DESKTOP_GEOMETRY,
         xtype: ATOM_CARDINAL
     },
-    reply=GetDesktopGeometryReply,
-    cookie=GetDesktopGeometryCookie,
-    cookie_unchecked=GetDesktopGeometryCookieUnchecked
+    reply=GetDesktopGeometryReply
 }
 
 pub struct SetDesktopGeometry {
@@ -218,12 +180,6 @@ ewmh_client_message! {
 
 // _NET_DESTKOP_VIEWPORT x, y, CARDINAL[][2]/32
 // {{{
-pub struct GetDesktopViewport;
-
-pub struct GetDesktopViewportCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetDesktopViewportCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetDesktopViewportReply {
     pub x: u32,
@@ -241,13 +197,11 @@ impl From<xcb::x::GetPropertyReply> for GetDesktopViewportReply {
 
 ewmh_get_property! {
     request=GetDesktopViewport{
-        window: root_window,
+        window: root,
         property: _NET_DESKTOP_VIEWPORT,
         xtype: ATOM_CARDINAL
     },
-    reply=GetDesktopViewportReply,
-    cookie=GetDesktopViewportCookie,
-    cookie_unchecked=GetDesktopViewportCookieUnchecked
+    reply=GetDesktopViewportReply
 }
 
 pub struct SetDesktopViewport {
@@ -273,12 +227,6 @@ ewmh_client_message! {
 
 // _NET_CURRENT_DESKTOP desktop, CARDINAL/32
 // {{{
-pub struct GetCurrentDesktop;
-
-pub struct GetCurrentDesktopCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetCurrentDesktopCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetCurrentDesktopReply {
     pub desktop: u32,
@@ -294,13 +242,11 @@ impl From<xcb::x::GetPropertyReply> for GetCurrentDesktopReply {
 
 ewmh_get_property! {
     request=GetCurrentDesktop{
-        window: root_window,
+        window: root,
         property: _NET_CURRENT_DESKTOP,
         xtype: ATOM_CARDINAL
     },
-    reply=GetCurrentDesktopReply,
-    cookie=GetCurrentDesktopCookie,
-    cookie_unchecked=GetCurrentDesktopCookieUnchecked
+    reply=GetCurrentDesktopReply
 }
 
 pub struct SetCurrentDesktop {
@@ -326,12 +272,6 @@ ewmh_client_message! {
 
 // _NET_DESKTOP_NAMES desktop, UTF8_STRING[]
 // {{{
-pub struct GetDesktopNames;
-
-pub struct GetDesktopNamesCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetDesktopNamesCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetDesktopNamesReply {
     pub names: Vec<String>,
@@ -347,13 +287,11 @@ impl From<xcb::x::GetPropertyReply> for GetDesktopNamesReply {
 
 ewmh_get_property! {
     request=GetDesktopNames{
-        window: root_window,
+        window: root,
         property: _NET_DESKTOP_NAMES,
         xtype: UTF8_STRING
     },
-    reply=GetDesktopNamesReply,
-    cookie=GetDesktopNamesCookie,
-    cookie_unchecked=GetDesktopNamesCookieUnchecked
+    reply=GetDesktopNamesReply
 }
 
 pub struct SetDesktopNames {
@@ -379,12 +317,6 @@ ewmh_set_property! {
 
 // _NET_ACTIVE_WINDOW, WINDOW/32
 // {{{
-pub struct GetActiveWindow;
-
-pub struct GetActiveWindowCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetActiveWindowCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetActiveWindowReply {
     pub window: xcb::x::Window,
@@ -400,13 +332,11 @@ impl From<xcb::x::GetPropertyReply> for GetActiveWindowReply {
 
 ewmh_get_property! {
     request=GetActiveWindow{
-        window: root_window,
+        window: root,
         property: _NET_ACTIVE_WINDOW,
         xtype: ATOM_WINDOW
     },
-    reply=GetActiveWindowReply,
-    cookie=GetActiveWindowCookie,
-    cookie_unchecked=GetActiveWindowCookieUnchecked
+    reply=GetActiveWindowReply
 }
 
 pub struct SetActiveWindow {
@@ -444,13 +374,6 @@ ewmh_client_message! {
 
 // // _NET_WORKAREA, x, y, width, height, CARDINAL[][4]/32
 // {{{
-
-pub struct GetWorkarea;
-
-pub struct GetWorkareaCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetWorkareaCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetWorkareaReply {
     pub x: u32,
@@ -472,25 +395,16 @@ impl From<xcb::x::GetPropertyReply> for GetWorkareaReply {
 
 ewmh_get_property! {
     request=GetWorkarea{
-        window: root_window,
+        window: root,
         property: _NET_WORKAREA,
         xtype: ATOM_CARDINAL
     },
-    reply=GetWorkareaReply,
-    cookie=GetWorkareaCookie,
-    cookie_unchecked=GetWorkareaCookieUnchecked
+    reply=GetWorkareaReply
 }
-
 // }}}
 
 // // _NET_SUPPORTING_WM_CHECK, WINDOW/32
 // {{{
-pub struct GetSupportingWmCheck;
-
-pub struct GetSupportingWmCheckCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetSupportingWmCheckCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetSupportingWmCheckReply {
     pub window: xcb::x::Window,
@@ -503,16 +417,19 @@ impl From<xcb::x::GetPropertyReply> for GetSupportingWmCheckReply {
         }
     }
 }
+
+ewmh_get_property! {
+    request=GetSupportingWmCheck{
+        window: root,
+        property: _NET_SUPPORTING_WM_CHECK,
+        xtype: ATOM_WINDOW
+    },
+    reply=GetSupportingWmCheckReply
+}
 // }}}
 
 // _NET_VIRTUAL_ROOTS, WINDOW/32
 // {{{
-pub struct GetVirtualRoots;
-
-pub struct GetVirtualRootsCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetVirtualRootsCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetVirtualRootsReply {
     pub window: xcb::x::Window,
@@ -528,24 +445,16 @@ impl From<xcb::x::GetPropertyReply> for GetVirtualRootsReply {
 
 ewmh_get_property! {
     request=GetVirtualRoots{
-        window: root_window,
+        window: root,
         property: _NET_VIRTUAL_ROOTS,
         xtype: ATOM_WINDOW
     },
-    reply=GetVirtualRootsReply,
-    cookie=GetVirtualRootsCookie,
-    cookie_unchecked=GetVirtualRootsCookieUnchecked
+    reply=GetVirtualRootsReply
 }
 // }}}
 
 // _NET_DESKTOP_LAYOUT, orientation, columns, rows, starting_corner, CARDINAL[4]/32
 // {{{
-pub struct DesktopLayout;
-
-pub struct DesktopLayoutCookie(xcb::x::GetPropertyCookie);
-
-pub struct DesktopLayoutCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct DesktopLayoutReply {
     pub orientation: u32,
@@ -567,24 +476,16 @@ impl From<xcb::x::GetPropertyReply> for DesktopLayoutReply {
 
 ewmh_get_property! {
     request=DesktopLayout{
-        window: root_window,
+        window: root,
         property: _NET_DESKTOP_LAYOUT,
         xtype: ATOM_CARDINAL
     },
-    reply=DesktopLayoutReply,
-    cookie=DesktopLayoutCookie,
-    cookie_unchecked=DesktopLayoutCookieUnchecked
+    reply=DesktopLayoutReply
 }
 // }}}
 
 // _NET_SHOWING_DESKTOP desktop, CARDINAL/32
 // {{{
-pub struct GetShowingDesktop;
-
-pub struct GetShowingDesktopCookie(xcb::x::GetPropertyCookie);
-
-pub struct GetShowingDesktopCookieUnchecked(xcb::x::GetPropertyCookieUnchecked);
-
 #[derive(Debug)]
 pub struct GetShowingDesktopReply {
     pub is_showing_desktop: bool,
@@ -604,13 +505,11 @@ impl From<xcb::x::GetPropertyReply> for GetShowingDesktopReply {
 
 ewmh_get_property! {
     request=GetShowingDesktop{
-        window: root_window,
+        window: root,
         property: _NET_SHOWING_DESKTOP,
         xtype: ATOM_CARDINAL
     },
-    reply=GetShowingDesktopReply,
-    cookie=GetShowingDesktopCookie,
-    cookie_unchecked=GetShowingDesktopCookieUnchecked
+    reply=GetShowingDesktopReply
 }
 
 pub struct SetShowingDesktop {
