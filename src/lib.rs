@@ -4,6 +4,9 @@
 #[cfg(feature = "ewmh")]
 pub mod ewmh;
 
+#[cfg(feature = "icccm")]
+pub mod icccm;
+
 #[cfg(test)]
 mod tests {
     #[test]
