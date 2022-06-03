@@ -77,7 +77,7 @@ impl<'a> Connection<'a> {
 #[cfg(test)]
 mod tests {
     use crate::icccm::proto::{
-        GetWmHints, GetWmNormalHints, SetWmName, SetWmNormalHints, WmSizeHints,
+        GetWmHints, GetWmNormalHints, SetWmHints, SetWmName, SetWmNormalHints, WmSizeHints,
     };
 
     #[test]
@@ -138,6 +138,29 @@ mod tests {
         let request = GetWmHints::new(window);
         let cookie = icccm_con.send_request(&request);
         let reply = icccm_con.wait_for_reply(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn set_urgent() {
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let icccm_con = crate::icccm::Connection::connect(&xcb_con);
+
+        use xcb::XidNew;
+
+        let window = unsafe { xcb::x::Window::new(0x3c0013e) };
+
+        let request = GetWmHints::new(window);
+        let cookie = icccm_con.send_request(&request);
+        let reply = icccm_con.wait_for_reply(cookie);
+        println!("{:?}", reply);
+
+        let mut wm_hints = reply.size_hints;
+        wm_hints.toggle_urgent();
+
+        let urgent = SetWmHints::new(window, &mut wm_hints);
+        let cookie = icccm_con.send_request_checked(&urgent);
+        let reply = xcb_con.check_request(cookie);
         println!("{:?}", reply);
     }
 }
