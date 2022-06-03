@@ -1,14 +1,14 @@
 [package]
 name = "xcb-wm"
-version = "0.2.1"
+version = "0.3.0"
 authors = [ "Armin Friedl <dev@friedl.net>" ]
 description = "Rust implementation of xcb-wm - icccm and ewmh extensions for xcb"
 readme = "README.md"
 keywords = ["icccm", "ewmh", "xcb", "window", "x11"]
 license = "MIT"
 edition = "2018"
-repository = "https://git.friedl.net/incubator/xcb-wm"
-homepage = "https://git.friedl.net/incubator/xcb-wm"
+repository = "https://github.com/arminfriedl/xcb-wm"
+homepage = "https://github.com/arminfriedl/xcb-wm"
 
 [dependencies]
 xcb = "1"
