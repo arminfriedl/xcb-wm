@@ -88,7 +88,7 @@ macro_rules! _get_property_structs {
     };
     (@ewmh_priv $request:ident, client) => {
         paste! {
-            pub struct $request(xcb::x::Window);
+            pub struct $request(pub xcb::x::Window);
             pub struct [<$request Cookie>](xcb::x::GetPropertyCookie);
             pub struct [<$request CookieUnchecked>](xcb::x::GetPropertyCookieUnchecked);
 
