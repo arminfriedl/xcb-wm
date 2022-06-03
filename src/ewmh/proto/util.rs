@@ -8,9 +8,11 @@ pub(crate) fn x_buffer_to_strings(xbuf: &[u8]) -> Vec<String> {
         } else if !buf.is_empty() {
             vals.push(String::from_utf8(buf.clone()).unwrap());
             buf.clear();
-        } else {
-            buf.clear();
         }
+    }
+
+    if !buf.is_empty() { // drain buf
+        vals.push(String::from_utf8(buf.clone()).unwrap());
     }
 
     vals
