@@ -14,12 +14,14 @@ sits on top of [libxcb](https://gitlab.freedesktop.org/xorg/lib/libxcb). If you
 are already using rust-xcb you are also familiar with xcb-wm. The public APIs
 and general usage are intentionally close.
 
+xcb-wm works with rust-xcb 1.x and later.
+
 ## Usage
 Add this to your Cargo.toml:
 
 ```toml
 [dependencies]
-xcb-wm = "0.3.0"
+xcb-wm = "0.3.1"
 ```
 
 Each request is either a `Get*`, a `Set*` or a `Send*` struct. `Get*` structs
