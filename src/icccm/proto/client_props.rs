@@ -6,6 +6,7 @@
 
 use bitflags::bitflags;
 use std::convert::TryInto;
+use std::mem;
 use xcb::{Xid, XidNew};
 
 use crate::icccm::traits::*;
@@ -260,12 +261,12 @@ icccm_set_property! {
 }
 // }}}
 
-// WM_NORMAL_HINTS,
+// WM_NORMAL_HINTS, WM_SIZE_HINTS/32
 // {{{
 
 bitflags! {
     struct WmSizeHintsFlags: u32 {
-        const Empty       = 0b0000_0000_0000;
+        const None        = 0b0000_0000_0000;
         const USPosition  = 0b0000_0000_0001;
         const USSize      = 0b0000_0000_0010;
         const PPosition   = 0b0000_0000_0100;
@@ -302,7 +303,7 @@ pub struct WmSizeHints {
 impl Default for WmSizeHints {
     fn default() -> Self {
         WmSizeHints {
-            flags: WmSizeHintsFlags::Empty,
+            flags: WmSizeHintsFlags::None,
             x: 0,
             y: 0,
             width: 0,
@@ -478,6 +479,196 @@ icccm_set_hint_property! {
     request=SetWmNormalHints{
         property: ATOM_WM_NORMAL_HINTS,
         xtype: ATOM_WM_SIZE_HINTS
+    }
+}
+// }}}
+
+// WM_HINTS, WM_HINTS//32
+// {{{
+
+bitflags! {
+    struct WmHintsFlags: u32 {
+        const None             = 0b0000_0000_0000;
+        const InputHint        = 0b0000_0000_0001;
+        const StateHint        = 0b0000_0000_0010;
+        const IconPixmapHint   = 0b0000_0000_0100;
+        const IconWindowHint   = 0b0000_0000_1000;
+        const IconPositionHint = 0b0000_0001_0000;
+        const IconMaskHint     = 0b0000_0010_0000;
+        const WindowGroupHint  = 0b0000_0100_0000;
+        const MessageHint      = 0b0000_1000_0000;
+        const UrgencyHint      = 0b0001_0000_0000;
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+#[repr(u32)]
+pub enum WmInitialState {
+    None = 4,
+    Withdrawn = 0,
+    Normal = 1,
+    Iconic = 3,
+}
+
+#[derive(Debug)]
+pub struct WmHints {
+    flags: WmHintsFlags,
+    input: bool,
+    initial_state: WmInitialState,
+    icon_pixmap: xcb::x::Pixmap,
+    icon_window: xcb::x::Window,
+    icon_x: u32,
+    icon_y: u32,
+    icon_mask: xcb::x::Pixmap,
+    window_group: xcb::x::Window,
+}
+
+impl Default for WmHints {
+    fn default() -> Self {
+        WmHints {
+            flags: WmHintsFlags::None,
+            input: true,
+            initial_state: WmInitialState::None,
+            icon_pixmap: xcb::x::Pixmap::none(),
+            icon_window: xcb::x::Window::none(),
+            icon_x: 0,
+            icon_y: 0,
+            icon_mask: xcb::x::Pixmap::none(),
+            window_group: xcb::x::Window::none(),
+        }
+    }
+}
+
+impl WmHints {
+    pub fn as_data(&mut self) -> Vec<u32> {
+        let initial_state = if self.flags.contains(WmHintsFlags::StateHint) {
+            self.initial_state as u32
+        } else {
+            0x00
+        };
+
+        vec![
+            self.flags.bits,
+            self.input as u32,
+            initial_state,
+            self.icon_pixmap.resource_id(),
+            self.icon_window.resource_id(),
+            self.icon_x,
+            self.icon_y,
+            self.icon_mask.resource_id(),
+            self.window_group.resource_id(),
+        ]
+    }
+
+    pub fn from_reply(reply: xcb::x::GetPropertyReply) -> WmHints {
+        let packed_vals = reply.value::<u32>();
+        let flags: WmHintsFlags = WmHintsFlags::from_bits_truncate(packed_vals[0]);
+
+        let initial_state = if flags.contains(WmHintsFlags::StateHint) {
+            unsafe { mem::transmute(packed_vals[2]) }
+        } else {
+            WmInitialState::None
+        };
+
+        WmHints {
+            flags: flags,
+            input: packed_vals[1] != 0,
+            initial_state: initial_state,
+            icon_pixmap: unsafe { xcb::x::Pixmap::new(packed_vals[3]) },
+            icon_window: unsafe { xcb::x::Window::new(packed_vals[4]) },
+            icon_x: packed_vals[5],
+            icon_y: packed_vals[6],
+            icon_mask: unsafe { xcb::x::Pixmap::new(packed_vals[7]) },
+            window_group: unsafe { xcb::x::Window::new(packed_vals[8]) },
+        }
+    }
+
+    pub fn input(&mut self, input: bool) {
+        self.flags |= WmHintsFlags::InputHint;
+        self.input = input;
+    }
+
+    pub fn initial_state(&mut self, state: WmInitialState) {
+        match state {
+            WmInitialState::None => {
+                self.flags &= !WmHintsFlags::StateHint;
+            }
+            _ => {
+                self.flags |= WmHintsFlags::StateHint;
+                self.initial_state = state;
+            }
+        }
+    }
+
+    pub fn icon_pixmap(&mut self, pixmap: xcb::x::Pixmap) {
+        self.flags |= WmHintsFlags::IconPixmapHint;
+        self.icon_pixmap = pixmap;
+    }
+
+    pub fn icon_mask(&mut self, mask: xcb::x::Pixmap) {
+        self.flags |= WmHintsFlags::IconMaskHint;
+        self.icon_mask = mask;
+    }
+
+    pub fn icon_window(&mut self, window: xcb::x::Window) {
+        self.flags |= WmHintsFlags::IconWindowHint;
+        self.icon_window = window;
+    }
+
+    pub fn window_group(&mut self, window: xcb::x::Window) {
+        self.flags |= WmHintsFlags::WindowGroupHint;
+        self.window_group = window;
+    }
+
+    pub fn toggle_urgent(&mut self) {
+        self.flags.toggle(WmHintsFlags::UrgencyHint);
+    }
+
+    pub fn is_urgent(&mut self) -> bool {
+        self.flags.contains(WmHintsFlags::UrgencyHint)
+    }
+}
+
+#[derive(Debug)]
+pub struct GetWmHintsReply {
+    pub size_hints: WmHints,
+}
+
+impl From<xcb::x::GetPropertyReply> for GetWmHintsReply {
+    fn from(reply: xcb::x::GetPropertyReply) -> Self {
+        GetWmHintsReply {
+            size_hints: WmHints::from_reply(reply),
+        }
+    }
+}
+
+icccm_get_property! {
+    request=GetWmHints{
+        window: client,
+        property: ATOM_WM_HINTS,
+        xtype: ATOM_WM_HINTS
+    },
+    reply=GetWmHintsReply
+}
+
+pub struct SetWmHints {
+    window: xcb::x::Window,
+    data: Vec<u32>,
+}
+
+impl SetWmHints {
+    pub fn new(window: xcb::x::Window, hints: &mut WmHints) -> SetWmHints {
+        SetWmHints {
+            window: window,
+            data: hints.as_data(),
+        }
+    }
+}
+
+icccm_set_hint_property! {
+    request=SetWmHints{
+        property: ATOM_WM_HINTS,
+        xtype: ATOM_WM_HINTS
     }
 }
 // }}}
