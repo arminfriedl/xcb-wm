@@ -76,7 +76,7 @@ impl<'a> Connection<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::icccm::proto::SetWmName;
+    use crate::icccm::proto::{GetWmNormalHints, SetWmName, SetWmNormalHints, WmSizeHints};
 
     #[test]
     fn number_of_desktops() {
@@ -106,6 +106,21 @@ mod tests {
         let request = SetWmName::new(window, xcb::x::ATOM_STRING, name);
         let cookie = icccm_con.send_request_checked(&request);
         let reply = xcb_con.check_request(cookie);
+        println!("{:?}", reply);
+    }
+
+    #[test]
+    fn get_wm_normal_hints() {
+        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
+        let icccm_con = crate::icccm::Connection::connect(&xcb_con);
+
+        use xcb::XidNew;
+
+        let window = unsafe { xcb::x::Window::new(0x440013e) };
+
+        let request = GetWmNormalHints::new(window);
+        let cookie = icccm_con.send_request(&request);
+        let reply = icccm_con.wait_for_reply(cookie);
         println!("{:?}", reply);
     }
 }

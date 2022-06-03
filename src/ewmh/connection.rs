@@ -112,17 +112,6 @@ mod tests {
         println!("{:?}", reply);
     }
 
-    #[test]
-    fn set_number_of_desktops() {
-        let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
-        let ewmh_con = crate::ewmh::Connection::connect(&xcb_con);
-
-        let request = crate::ewmh::proto::SetNumberOfDesktops::new(&ewmh_con, 4);
-        let cookie = ewmh_con.send_request_checked(&request);
-        let reply = xcb_con.check_request(cookie);
-        println!("{:?}", reply);
-    }
-
     // #[test]
     // fn number_of_desktops2() {
     //     let xcb_con = xcb::Connection::connect(Option::None).unwrap().0;
