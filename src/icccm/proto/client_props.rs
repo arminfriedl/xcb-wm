@@ -6,6 +6,7 @@
 
 use bitflags::bitflags;
 use std::convert::TryInto;
+use std::io::BufRead;
 use std::mem;
 use xcb::{Xid, XidNew};
 
@@ -210,6 +211,63 @@ impl<T: xcb::x::PropEl> SetWmClientMachine<T> {
 icccm_set_text_property! {
     request=SetWmClientMachine{
         property: ATOM_WM_CLIENT_MACHINE
+    }
+}
+// }}}
+
+// WM_TRANSIENT_FOR, WINDOW/32
+// {{{
+#[derive(Debug)]
+pub struct GetWmClassReply {
+    pub instance: String,
+    pub class: String,
+}
+
+impl From<xcb::x::GetPropertyReply> for GetWmClassReply {
+    fn from(reply: xcb::x::GetPropertyReply) -> Self {
+        let values: Vec<&[u8]> = reply.value::<u8>().split(|v| *v == 0x00 as u8).collect();
+
+        GetWmClassReply {
+            instance: String::from_utf8_lossy(values[0]).to_string(),
+            class: String::from_utf8_lossy(values[1]).to_string(),
+        }
+    }
+}
+
+icccm_get_property! {
+    request=GetWmClass{
+        window: client,
+        property: ATOM_WM_CLASS,
+        xtype: ATOM_STRING
+    },
+    reply=GetWmClassReply
+}
+
+pub struct SetWmClass {
+    window: xcb::x::Window,
+    data: Vec<u8>,
+}
+
+impl SetWmClass {
+    // TODO better name for second window
+    pub fn new(window: xcb::x::Window, instance: &str, class: &str) -> SetWmClass {
+        let mut data = vec![];
+        data.append(&mut instance.as_bytes().to_vec());
+        data.push(0x00 as u8);
+        data.append(&mut class.as_bytes().to_vec());
+        data.push(0x00 as u8);
+
+        SetWmClass {
+            window: window,
+            data: data,
+        }
+    }
+}
+
+icccm_set_string_property! {
+    request=SetWmClass {
+        property: ATOM_WM_CLASS,
+        xtype: ATOM_STRING
     }
 }
 // }}}

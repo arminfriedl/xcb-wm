@@ -127,6 +127,46 @@ macro_rules! icccm_set_property {
     };
 }
 
+macro_rules! icccm_set_string_property {
+    (request=$request:ident{
+        property: $property:ident,
+        xtype: $type:ident
+     }) => {
+        impl<'a> IcccmRequest<'a> for $request {
+            type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
+            type IcccmCookie = xcb::VoidCookie;
+
+            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
+                xcb::x::ChangeProperty {
+                    mode: xcb::x::PropMode::Replace,
+                    window: self.window,
+                    property: xcb::x::$property,
+                    r#type: xcb::x::$type,
+                    data: &self.data,
+                }
+            }
+
+            fn convert_cookie(&'a self, xcb_cookie: xcb::VoidCookie) -> Self::IcccmCookie {
+                xcb_cookie
+            }
+        }
+
+        impl<'a> IcccmVoidRequestChecked<'a> for $request {
+            type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
+
+            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
+                xcb::x::ChangeProperty {
+                    mode: xcb::x::PropMode::Replace,
+                    window: self.window,
+                    property: xcb::x::$property,
+                    r#type: xcb::x::$type,
+                    data: &self.data,
+                }
+            }
+        }
+    };
+}
+
 macro_rules! icccm_set_hint_property {
     (request=$request:ident{
         property: $property:ident,
