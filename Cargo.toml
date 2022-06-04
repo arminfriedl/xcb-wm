@@ -18,3 +18,7 @@ bitflags = "1.3.2"
 [features]
 icccm = []
 ewmh = []
+
+# Show documentations for `icccm` and `ewmh` features on http://docs.rs
+[package.metadata.docs.rs]
+rustc-args = ["--cfg", "feature='icccm'", "--cfg", "feature='ewmh'"]
