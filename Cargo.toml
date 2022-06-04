@@ -20,5 +20,6 @@ icccm = []
 ewmh = []
 
 # Show documentations for `icccm` and `ewmh` features on http://docs.rs
+# https://docs.rs/about/metadata
 [package.metadata.docs.rs]
-rustc-args = ["--cfg", "feature='icccm'", "--cfg", "feature='ewmh'"]
+all-features = true
