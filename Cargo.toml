@@ -1,6 +1,6 @@
 [package]
 name = "xcb-wm"
-version = "0.3.3"
+version = "0.3.4"
 authors = [ "Armin Friedl <dev@friedl.net>" ]
 description = "Rust implementation of xcb-wm - icccm and ewmh extensions for xcb"
 readme = "README.md"
