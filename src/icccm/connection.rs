@@ -57,6 +57,13 @@ impl<'a> Connection<'a> {
         request.send(self)
     }
 
+    pub fn send_and_check_request<R>(&self, request: &R) -> xcb::ProtocolResult<()>
+    where
+        R: IcccmVoidRequestChecked,
+    {
+        self.con.check_request(request.send(self))
+    }
+
     pub fn wait_for_reply<C>(&self, cookie: C) -> C::Reply
     where
         C: IcccmPropertyCookieChecked,
@@ -71,6 +78,10 @@ impl<'a> Connection<'a> {
     {
         let xcb_reply = self.con.wait_for_reply_unchecked(cookie.inner());
         xcb_reply.unwrap().unwrap().into()
+    }
+
+    pub fn check_request(&self, cookie: xcb::VoidCookieChecked) -> xcb::ProtocolResult<()> {
+        self.con.check_request(cookie)
     }
 }
 
