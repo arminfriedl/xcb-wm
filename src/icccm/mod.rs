@@ -10,3 +10,4 @@ mod connection;
 pub use connection::Connection;
 
 pub mod proto;
+pub use proto::*;

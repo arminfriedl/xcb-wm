@@ -10,3 +10,4 @@ pub use atoms::Atoms;
 pub use connection::Connection;
 
 pub mod proto;
+pub use proto::*;
