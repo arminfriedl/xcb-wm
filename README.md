@@ -21,7 +21,7 @@ Add this to your Cargo.toml:
 
 ```toml
 [dependencies]
-xcb-wm = "0.3.4"
+xcb-wm = "0.3.5"
 ```
 
 Each request is either a `Get*`, a `Set*` or a `Send*` struct. `Get*` structs
