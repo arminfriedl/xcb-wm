@@ -57,9 +57,9 @@ impl<'a> Connection<'a> {
         request.send(self)
     }
 
-    pub fn send_and_check_request<R>(&self, request: &R) -> xcb::ProtocolResult<()>
+    pub fn send_and_check_request<'b, R>(&self, request: &'b R) -> xcb::ProtocolResult<()>
     where
-        R: IcccmVoidRequestChecked,
+        R: IcccmVoidRequestChecked<'b>,
     {
         self.con.check_request(request.send(self))
     }
