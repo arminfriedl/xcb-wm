@@ -21,7 +21,7 @@ Add this to your Cargo.toml:
 
 ```toml
 [dependencies]
-xcb-wm = "0.3.6"
+xcb-wm = "0.4.0"
 ```
 
 Each request is either a `Get*`, a `Set*` or a `Send*` struct. `Get*` structs
@@ -66,7 +66,7 @@ let cookie = ewmh_con.send_request(&request);
 //
 // Replies are automatically de-serialized into meaningful Rust structs. You
 // take full ownership of the reply struct.
-let reply = ewmh_con.wait_for_reply(cookie);
+let reply = ewmh_con.wait_for_reply(cookie).unwrap();
 
 // All replies implement `Debug` so you can also print them
 println!("{:?}", reply);
