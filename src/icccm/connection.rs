@@ -64,20 +64,20 @@ impl<'a> Connection<'a> {
         self.con.check_request(request.send(self))
     }
 
-    pub fn wait_for_reply<C>(&self, cookie: C) -> C::Reply
+    pub fn wait_for_reply<C>(&self, cookie: C) -> xcb::Result<C::Reply>
     where
         C: IcccmPropertyCookieChecked,
     {
         let xcb_reply = self.con.wait_for_reply(cookie.inner());
-        xcb_reply.unwrap().into()
+        xcb_reply.map(|reply| reply.into())
     }
 
-    pub fn wait_for_reply_unchecked<C>(&self, cookie: C) -> C::Reply
+    pub fn wait_for_reply_unchecked<C>(&self, cookie: C) -> xcb::ConnResult<Option<C::Reply>>
     where
         C: IcccmPropertyCookieUnchecked,
     {
         let xcb_reply = self.con.wait_for_reply_unchecked(cookie.inner());
-        xcb_reply.unwrap().unwrap().into()
+        xcb_reply.map(|reply| reply.map(|reply| reply.into()))
     }
 
     pub fn check_request(&self, cookie: xcb::VoidCookieChecked) -> xcb::ProtocolResult<()> {
@@ -182,7 +182,7 @@ mod tests {
         let reply = icccm_con.wait_for_reply(cookie);
         println!("{:?}", reply);
 
-        let mut wm_hints = reply.size_hints;
+        let mut wm_hints = reply.unwrap().size_hints;
         wm_hints.toggle_urgent();
 
         let urgent = SetWmHints::new(window, &mut wm_hints);
