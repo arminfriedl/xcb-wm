@@ -61,20 +61,20 @@ impl<'a> Connection<'a> {
         self.con.check_request(request.send(self))
     }
 
-    pub fn wait_for_reply<C>(&self, cookie: C) -> C::Reply
+    pub fn wait_for_reply<C>(&self, cookie: C) -> xcb::Result<C::Reply>
     where
         C: EwmhPropertyCookieChecked,
     {
         let xcb_reply = self.con.wait_for_reply(cookie.inner());
-        xcb_reply.unwrap().into()
+        xcb_reply.map(|reply| reply.into())
     }
 
-    pub fn wait_for_reply_unchecked<C>(&self, cookie: C) -> C::Reply
+    pub fn wait_for_reply_unchecked<C>(&self, cookie: C) -> xcb::ConnResult<Option<C::Reply>>
     where
         C: EwmhPropertyCookieUnchecked,
     {
         let xcb_reply = self.con.wait_for_reply_unchecked(cookie.inner());
-        xcb_reply.unwrap().unwrap().into()
+        xcb_reply.map(|reply| reply.map(|reply| reply.into()))
     }
 
     pub fn check_request(&self, cookie: xcb::VoidCookieChecked) -> xcb::ProtocolResult<()> {
@@ -94,7 +94,7 @@ mod tests {
         let reply = ewmh_con.wait_for_reply(cookie);
         println!("{:?}", reply);
 
-        for atom in reply.atoms {
+        for atom in reply.unwrap().atoms {
             let cookie = xcb_con.send_request(&xcb::x::GetAtomName { atom: atom });
 
             println!("{}", xcb_con.wait_for_reply(cookie).unwrap().name());
