@@ -95,7 +95,7 @@ mod tests {
         println!("{:?}", reply);
 
         for atom in reply.unwrap().atoms {
-            let cookie = xcb_con.send_request(&xcb::x::GetAtomName { atom: atom });
+            let cookie = xcb_con.send_request(&xcb::x::GetAtomName { atom });
 
             println!("{}", xcb_con.wait_for_reply(cookie).unwrap().name());
         }

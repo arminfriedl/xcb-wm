@@ -44,7 +44,7 @@ pub struct SetWmName {
 impl SetWmName {
     pub fn new(window: xcb::x::Window, name: &str) -> SetWmName {
         SetWmName {
-            window: window,
+            window,
             data: strings_to_x_buffer(vec![name]),
         }
     }
@@ -167,7 +167,7 @@ pub struct SetWmDesktop {
 impl SetWmDesktop {
     pub fn new(window: xcb::x::Window, desktop: u32) -> SetWmDesktop {
         SetWmDesktop {
-            window: window,
+            window,
             data: vec![desktop],
         }
     }

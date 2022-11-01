@@ -40,7 +40,7 @@ macro_rules! _get_property_request {
     };
 
     (@icccm_priv client, $property:ident, $xtype:ident) => {
-        fn xcb_request(&self, con: &Connection) -> xcb::x::GetProperty {
+        fn xcb_request(&self, _con: &Connection) -> xcb::x::GetProperty {
             xcb::x::GetProperty {
                 delete: false,
                 window: self.0,
