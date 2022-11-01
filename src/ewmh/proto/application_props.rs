@@ -308,3 +308,28 @@ ewmh_client_message! {
     request=SendWmState{destination: root}
 }
 // }}}
+
+// _NET_WM_USER_TIME CARDINAL/32
+// {{{
+#[derive(Debug)]
+pub struct GetWmUserTimeReply {
+    pub time: u32,
+}
+
+impl From<xcb::x::GetPropertyReply> for GetWmUserTimeReply {
+    fn from(reply: xcb::x::GetPropertyReply) -> Self {
+        Self {
+            time: reply.value::<u32>()[0],
+        }
+    }
+}
+
+ewmh_get_property! {
+    request=GetWmUserTime{
+        window: client,
+        property: _NET_WM_USER_TIME,
+        xtype: ATOM_CARDINAL
+    },
+    reply=GetWmUserTimeReply
+}
+// }}}
