@@ -6,7 +6,7 @@ macro_rules! icccm_set_text_property {
             type XcbRequest = xcb::x::ChangeProperty<'a, T>;
             type IcccmCookie = xcb::VoidCookie;
 
-            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, T> {
+            fn xcb_request(&'a self, _con: &Connection) -> xcb::x::ChangeProperty<'a, T> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
                     window: self.window,
@@ -24,7 +24,7 @@ macro_rules! icccm_set_text_property {
         impl<'a, T: 'a + xcb::x::PropEl> IcccmVoidRequestChecked<'a> for $request<T> {
             type XcbRequest = xcb::x::ChangeProperty<'a, T>;
 
-            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, T> {
+            fn xcb_request(&'a self, _con: &Connection) -> xcb::x::ChangeProperty<'a, T> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
                     window: self.window,
@@ -92,7 +92,7 @@ macro_rules! icccm_set_property {
 
             fn xcb_request(
                 &'a self,
-                con: &Connection,
+                _con: &Connection,
             ) -> xcb::x::ChangeProperty<'a, xcb::x::Window> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
@@ -113,7 +113,7 @@ macro_rules! icccm_set_property {
 
             fn xcb_request(
                 &'a self,
-                con: &Connection,
+                _con: &Connection,
             ) -> xcb::x::ChangeProperty<'a, xcb::x::Window> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
@@ -136,7 +136,7 @@ macro_rules! icccm_set_string_property {
             type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
             type IcccmCookie = xcb::VoidCookie;
 
-            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
+            fn xcb_request(&'a self, _con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
                     window: self.window,
@@ -154,7 +154,7 @@ macro_rules! icccm_set_string_property {
         impl<'a> IcccmVoidRequestChecked<'a> for $request {
             type XcbRequest = xcb::x::ChangeProperty<'a, u8>;
 
-            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
+            fn xcb_request(&'a self, _con: &Connection) -> xcb::x::ChangeProperty<'a, u8> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
                     window: self.window,
@@ -176,7 +176,7 @@ macro_rules! icccm_set_hint_property {
             type XcbRequest = xcb::x::ChangeProperty<'a, u32>;
             type IcccmCookie = xcb::VoidCookie;
 
-            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u32> {
+            fn xcb_request(&'a self, _con: &Connection) -> xcb::x::ChangeProperty<'a, u32> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
                     window: self.window,
@@ -194,7 +194,7 @@ macro_rules! icccm_set_hint_property {
         impl<'a> IcccmVoidRequestChecked<'a> for $request {
             type XcbRequest = xcb::x::ChangeProperty<'a, u32>;
 
-            fn xcb_request(&'a self, con: &Connection) -> xcb::x::ChangeProperty<'a, u32> {
+            fn xcb_request(&'a self, _con: &Connection) -> xcb::x::ChangeProperty<'a, u32> {
                 xcb::x::ChangeProperty {
                     mode: xcb::x::PropMode::Replace,
                     window: self.window,

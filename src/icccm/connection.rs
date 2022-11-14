@@ -87,10 +87,7 @@ impl<'a> Connection<'a> {
 
 #[cfg(test)]
 mod tests {
-    use crate::icccm::proto::{
-        GetWmClass, GetWmHints, GetWmNormalHints, SetWmHints, SetWmName, SetWmNormalHints,
-        WmSizeHints,
-    };
+    use crate::icccm::proto::{GetWmClass, GetWmHints, GetWmNormalHints, SetWmHints, SetWmName};
 
     #[test]
     fn number_of_desktops() {

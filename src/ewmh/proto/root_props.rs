@@ -513,7 +513,7 @@ pub struct SetShowingDesktop {
 
 impl SetShowingDesktop {
     pub fn new(connection: &Connection, show_desktop: bool) -> SetShowingDesktop {
-        let data = if show_desktop { 1 } else { 0 };
+        let data = u32::from(show_desktop);
 
         SetShowingDesktop {
             client_message: xcb::x::ClientMessageEvent::new(

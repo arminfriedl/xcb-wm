@@ -44,7 +44,7 @@ pub struct SetWmName {
 impl SetWmName {
     pub fn new(window: xcb::x::Window, name: &str) -> SetWmName {
         SetWmName {
-            window: window,
+            window,
             data: strings_to_x_buffer(vec![name]),
         }
     }
@@ -167,7 +167,7 @@ pub struct SetWmDesktop {
 impl SetWmDesktop {
     pub fn new(window: xcb::x::Window, desktop: u32) -> SetWmDesktop {
         SetWmDesktop {
-            window: window,
+            window,
             data: vec![desktop],
         }
     }
@@ -306,5 +306,30 @@ impl SendWmState {
 
 ewmh_client_message! {
     request=SendWmState{destination: root}
+}
+// }}}
+
+// _NET_WM_USER_TIME CARDINAL/32
+// {{{
+#[derive(Debug)]
+pub struct GetWmUserTimeReply {
+    pub time: u32,
+}
+
+impl From<xcb::x::GetPropertyReply> for GetWmUserTimeReply {
+    fn from(reply: xcb::x::GetPropertyReply) -> Self {
+        Self {
+            time: reply.value::<u32>()[0],
+        }
+    }
+}
+
+ewmh_get_property! {
+    request=GetWmUserTime{
+        window: client,
+        property: _NET_WM_USER_TIME,
+        xtype: ATOM_CARDINAL
+    },
+    reply=GetWmUserTimeReply
 }
 // }}}
