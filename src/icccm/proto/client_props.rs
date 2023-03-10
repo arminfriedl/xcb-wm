@@ -5,8 +5,6 @@
 #![allow(dead_code)]
 
 use bitflags::bitflags;
-use std::convert::TryInto;
-use std::io::BufRead;
 use std::mem;
 use xcb::{Xid, XidNew};
 
@@ -27,7 +25,7 @@ impl From<xcb::x::GetPropertyReply> for GetWmNameReply {
         let x = reply.value::<u8>().into();
         GetWmNameReply {
             // TODO Compound string
-            name: String::from_utf8(x).unwrap(),
+            name: String::from_utf8(x).unwrap_or_default(),
         }
     }
 }
@@ -50,8 +48,8 @@ pub struct SetWmName<T: xcb::x::PropEl> {
 impl<T: xcb::x::PropEl> SetWmName<T> {
     pub fn new(window: xcb::x::Window, encoding: xcb::x::Atom, name: Vec<T>) -> SetWmName<T> {
         SetWmName {
-            window: window,
-            encoding: encoding,
+            window,
+            encoding,
             data: name,
         }
     }
@@ -76,7 +74,7 @@ impl From<xcb::x::GetPropertyReply> for GetWmIconNameReply {
         let x = reply.value::<u8>().into();
         GetWmIconNameReply {
             // TODO Compound string
-            name: String::from_utf8(x).unwrap(),
+            name: String::from_utf8(x).unwrap_or_default(),
         }
     }
 }
@@ -99,8 +97,8 @@ pub struct SetWmIconName<T: xcb::x::PropEl> {
 impl<T: xcb::x::PropEl> SetWmIconName<T> {
     pub fn new(window: xcb::x::Window, encoding: xcb::x::Atom, name: Vec<T>) -> SetWmIconName<T> {
         SetWmIconName {
-            window: window,
-            encoding: encoding,
+            window,
+            encoding,
             data: name,
         }
     }
@@ -148,7 +146,7 @@ impl SetWmColorMapWindows {
         colormap_windows: Vec<xcb::x::Window>,
     ) -> SetWmColorMapWindows {
         SetWmColorMapWindows {
-            window: window,
+            window,
             data: colormap_windows,
         }
     }
@@ -174,7 +172,7 @@ impl From<xcb::x::GetPropertyReply> for GetWmClientMachineReply {
         let x = reply.value::<u8>().into();
         GetWmClientMachineReply {
             // TODO Compound string
-            name: String::from_utf8(x).unwrap(),
+            name: String::from_utf8(x).unwrap_or_default(),
         }
     }
 }
@@ -201,8 +199,8 @@ impl<T: xcb::x::PropEl> SetWmClientMachine<T> {
         name: Vec<T>,
     ) -> SetWmClientMachine<T> {
         SetWmClientMachine {
-            window: window,
-            encoding: encoding,
+            window,
+            encoding,
             data: name,
         }
     }
@@ -225,7 +223,7 @@ pub struct GetWmClassReply {
 
 impl From<xcb::x::GetPropertyReply> for GetWmClassReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
-        let values: Vec<&[u8]> = reply.value::<u8>().split(|v| *v == 0x00 as u8).collect();
+        let values: Vec<&[u8]> = reply.value::<u8>().split(|v| *v == 0x00_u8).collect();
 
         GetWmClassReply {
             instance: String::from_utf8_lossy(values[0]).to_string(),
@@ -253,14 +251,11 @@ impl SetWmClass {
     pub fn new(window: xcb::x::Window, instance: &str, class: &str) -> SetWmClass {
         let mut data = vec![];
         data.append(&mut instance.as_bytes().to_vec());
-        data.push(0x00 as u8);
+        data.push(0x00_u8);
         data.append(&mut class.as_bytes().to_vec());
-        data.push(0x00 as u8);
+        data.push(0x00_u8);
 
-        SetWmClass {
-            window: window,
-            data: data,
-        }
+        SetWmClass { window, data }
     }
 }
 
@@ -282,7 +277,14 @@ pub struct GetWmTransientForReply {
 impl From<xcb::x::GetPropertyReply> for GetWmTransientForReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmTransientForReply {
-            window: unsafe { xcb::x::Window::new(reply.value::<u32>()[0]) },
+            window: unsafe {
+                xcb::x::Window::new(
+                    reply
+                        .value::<u32>()
+                        .first()
+                        .map_or_else(Default::default, ToOwned::to_owned),
+                )
+            },
         }
     }
 }
@@ -305,7 +307,7 @@ impl SetWmTransientFor {
     // TODO better name for second window
     pub fn new(window: xcb::x::Window, window2: xcb::x::Window) -> SetWmTransientFor {
         SetWmTransientFor {
-            window: window,
+            window,
             data: vec![window2],
         }
     }
@@ -527,7 +529,7 @@ pub struct SetWmNormalHints {
 impl SetWmNormalHints {
     pub fn new(window: xcb::x::Window, size_hints: &mut WmSizeHints) -> SetWmNormalHints {
         SetWmNormalHints {
-            window: window,
+            window,
             data: size_hints.as_data(),
         }
     }
@@ -629,9 +631,9 @@ impl WmHints {
         };
 
         WmHints {
-            flags: flags,
+            flags,
             input: packed_vals[1] != 0,
-            initial_state: initial_state,
+            initial_state,
             icon_pixmap: unsafe { xcb::x::Pixmap::new(packed_vals[3]) },
             icon_window: unsafe { xcb::x::Window::new(packed_vals[4]) },
             icon_x: packed_vals[5],
@@ -717,7 +719,7 @@ pub struct SetWmHints {
 impl SetWmHints {
     pub fn new(window: xcb::x::Window, hints: &mut WmHints) -> SetWmHints {
         SetWmHints {
-            window: window,
+            window,
             data: hints.as_data(),
         }
     }
