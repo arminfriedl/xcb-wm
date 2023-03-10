@@ -22,7 +22,7 @@ pub struct GetWmNameReply {
 impl From<xcb::x::GetPropertyReply> for GetWmNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmNameReply {
-            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
+            name: x_buffer_string_or_default!(reply),
         }
     }
 }
@@ -44,7 +44,7 @@ pub struct SetWmName {
 impl SetWmName {
     pub fn new(window: xcb::x::Window, name: &str) -> SetWmName {
         SetWmName {
-            window: window,
+            window,
             data: strings_to_x_buffer(vec![name]),
         }
     }
@@ -70,7 +70,7 @@ pub struct GetWmVisibleNameReply {
 impl From<xcb::x::GetPropertyReply> for GetWmVisibleNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmVisibleNameReply {
-            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
+            name: x_buffer_string_or_default!(reply),
         }
     }
 }
@@ -95,7 +95,7 @@ pub struct GetWmIconNameReply {
 impl From<xcb::x::GetPropertyReply> for GetWmIconNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmIconNameReply {
-            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
+            name: x_buffer_string_or_default!(reply),
         }
     }
 }
@@ -120,7 +120,7 @@ pub struct GetWmVisibleIconNameReply {
 impl From<xcb::x::GetPropertyReply> for GetWmVisibleIconNameReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmVisibleIconNameReply {
-            name: x_buffer_to_strings(reply.value::<u8>())[0].to_owned(),
+            name: x_buffer_string_or_default!(reply),
         }
     }
 }
@@ -145,7 +145,7 @@ pub struct GetWmDesktopReply {
 impl From<xcb::x::GetPropertyReply> for GetWmDesktopReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWmDesktopReply {
-            desktop: reply.value::<u32>()[0],
+            desktop: nth_u32_value_or_default!(reply, 0),
         }
     }
 }
@@ -167,7 +167,7 @@ pub struct SetWmDesktop {
 impl SetWmDesktop {
     pub fn new(window: xcb::x::Window, desktop: u32) -> SetWmDesktop {
         SetWmDesktop {
-            window: window,
+            window,
             data: vec![desktop],
         }
     }

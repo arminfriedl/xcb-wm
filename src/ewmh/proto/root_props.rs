@@ -95,7 +95,7 @@ pub struct GetNumberOfDesktopsReply {
 impl From<xcb::x::GetPropertyReply> for GetNumberOfDesktopsReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetNumberOfDesktopsReply {
-            desktops: reply.value::<u32>()[0],
+            desktops: nth_u32_value_or_default!(reply, 0),
         }
     }
 }
@@ -141,8 +141,8 @@ pub struct GetDesktopGeometryReply {
 impl From<xcb::x::GetPropertyReply> for GetDesktopGeometryReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetDesktopGeometryReply {
-            width: reply.value::<u32>()[0],
-            height: reply.value::<u32>()[1],
+            width: nth_u32_value_or_default!(reply, 0),
+            height: nth_u32_value_or_default!(reply, 1),
         }
     }
 }
@@ -188,8 +188,8 @@ pub struct GetDesktopViewportReply {
 impl From<xcb::x::GetPropertyReply> for GetDesktopViewportReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetDesktopViewportReply {
-            x: reply.value::<u32>()[0],
-            y: reply.value::<u32>()[1],
+            x: nth_u32_value_or_default!(reply, 0),
+            y: nth_u32_value_or_default!(reply, 1),
         }
     }
 }
@@ -234,7 +234,7 @@ pub struct GetCurrentDesktopReply {
 impl From<xcb::x::GetPropertyReply> for GetCurrentDesktopReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetCurrentDesktopReply {
-            desktop: reply.value::<u32>()[0],
+            desktop: nth_u32_value_or_default!(reply, 0),
         }
     }
 }
@@ -324,7 +324,7 @@ pub struct GetActiveWindowReply {
 impl From<xcb::x::GetPropertyReply> for GetActiveWindowReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetActiveWindowReply {
-            window: unsafe { xcb::x::Window::new(reply.value::<u32>()[0]) },
+            window: unsafe { xcb::x::Window::new(nth_u32_value_or_default!(reply, 0)) },
         }
     }
 }
@@ -384,10 +384,10 @@ pub struct GetWorkareaReply {
 impl From<xcb::x::GetPropertyReply> for GetWorkareaReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetWorkareaReply {
-            x: reply.value::<u32>()[0],
-            y: reply.value::<u32>()[1],
-            width: reply.value::<u32>()[2],
-            height: reply.value::<u32>()[3],
+            x: nth_u32_value_or_default!(reply, 0),
+            y: nth_u32_value_or_default!(reply, 1),
+            width: nth_u32_value_or_default!(reply, 2),
+            height: nth_u32_value_or_default!(reply, 3),
         }
     }
 }
@@ -412,7 +412,7 @@ pub struct GetSupportingWmCheckReply {
 impl From<xcb::x::GetPropertyReply> for GetSupportingWmCheckReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetSupportingWmCheckReply {
-            window: unsafe { xcb::x::Window::new(reply.value::<u32>()[0]) },
+            window: unsafe { xcb::x::Window::new(nth_u32_value_or_default!(reply, 0)) },
         }
     }
 }
@@ -437,7 +437,7 @@ pub struct GetVirtualRootsReply {
 impl From<xcb::x::GetPropertyReply> for GetVirtualRootsReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetVirtualRootsReply {
-            window: unsafe { xcb::x::Window::new(reply.value::<u32>()[0]) },
+            window: unsafe { xcb::x::Window::new(nth_u32_value_or_default!(reply, 0)) },
         }
     }
 }
@@ -465,10 +465,10 @@ pub struct DesktopLayoutReply {
 impl From<xcb::x::GetPropertyReply> for DesktopLayoutReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         DesktopLayoutReply {
-            orientation: reply.value::<u32>()[0],
-            columns: reply.value::<u32>()[1],
-            rows: reply.value::<u32>()[2],
-            starting_corner: reply.value::<u32>()[3],
+            orientation: nth_u32_value_or_default!(reply, 0),
+            columns: nth_u32_value_or_default!(reply, 1),
+            rows: nth_u32_value_or_default!(reply, 2),
+            starting_corner: nth_u32_value_or_default!(reply, 3),
         }
     }
 }
@@ -493,7 +493,7 @@ pub struct GetShowingDesktopReply {
 impl From<xcb::x::GetPropertyReply> for GetShowingDesktopReply {
     fn from(reply: xcb::x::GetPropertyReply) -> Self {
         GetShowingDesktopReply {
-            is_showing_desktop: { reply.value::<u32>()[0] == 1 },
+            is_showing_desktop: { nth_u32_value_or_default!(reply, 0) == 1 },
         }
     }
 }
